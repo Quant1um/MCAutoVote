@@ -6,7 +6,7 @@
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="LastAction" Type="System.DateTime" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">1753-01-01</Value>
     </Setting>
     <Setting Name="Hidden" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
