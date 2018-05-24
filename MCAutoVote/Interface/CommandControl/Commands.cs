@@ -184,21 +184,24 @@ namespace MCAutoVote.Interface.CommandControl
 
                 if (Vote.Auto.Enabled)
                 {
-                    if (Vote.Auto.UntilAction < TimeSpan.FromMinutes(1))
-                        Text.WriteLine("Less than minute left!", ConsoleColor.Gray);
+                    if(!Vote.IsNicknameValid)
+                        Text.WriteLine("Nickname is not valid!", ConsoleColor.DarkRed);
                     else
-                        Text.WriteLine("{0} left!", ConsoleColor.Gray, StringUtils.GetTimeString(Vote.Auto.UntilAction));
+                    {
+                        if (Vote.Auto.UntilAction < TimeSpan.FromMinutes(1))
+                            Text.WriteLine("Less than minute left!", ConsoleColor.Gray);
+                        else
+                            Text.WriteLine("{0} left!", ConsoleColor.Gray, StringUtils.GetTimeString(Vote.Auto.UntilAction));
+                    }          
                 }
             }
         };
 
-#if DEBUG
         [Description("Dumps settings.")]
         public static Command DumpSettings = (fullCmd, args) =>
         {
             foreach(SettingsProperty prop in Properties.Settings.Default.Properties)
                 Text.WriteLine("{0} ({1}) = {2}", prop.Name, prop.PropertyType.Name, Properties.Settings.Default[prop.Name]);
-        };
-#endif
+        };                                                                                                                                                                                                                 
     }
 }
