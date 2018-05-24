@@ -1,0 +1,2 @@
+# MCAutoVote
+Little automatization thing
