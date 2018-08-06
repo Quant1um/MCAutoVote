@@ -3,15 +3,26 @@ using MCAutoVote.Voting.Modules;
 using MCAutoVote.Properties;
 using System;
 using System.Threading;
-using MCAutoVote.Utilities.Sync;
+using MCAutoVote.Utilities.Multithreading;
 using MCAutoVote.Bootstrap;
 using System.Collections.Generic;
 using MCAutoVote.Utilities;
+using MCAutoVote.Web;
 
 namespace MCAutoVote.Voting
 {
     public static class Vote
     {
+        private class Context : IContext
+        {
+            public static Context Instance { get; } = new Context();
+
+            private Context() { }
+
+            public string Nickname => Vote.Nickname;
+            public IBrowser Browser => ApplicationContext.Browser;
+        }
+
         [LoadModule]
         public static class Auto
         {
@@ -109,7 +120,7 @@ namespace MCAutoVote.Voting
                                 Text.WriteLine();
 
                                 Text.Handler = ModuleTextHandler.Instance;
-                                module.Vote(Settings.Default.Nickname);
+                                module.Vote(Context.Instance);
                                 Text.Handler = DefaultTextHandler.Instance;
 
                                 success++;

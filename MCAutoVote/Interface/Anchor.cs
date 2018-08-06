@@ -4,7 +4,7 @@ namespace MCAutoVote.Interface
 {
     public class Anchor
     {
-        private int left, top;
+        private readonly int left, top;
 
         public Anchor(int left, int top)
         {

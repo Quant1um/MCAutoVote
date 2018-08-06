@@ -1,7 +1,7 @@
 ﻿using MCAutoVote.Interface;
 using MCAutoVote.Utilities;
+using MCAutoVote.Utilities.Multithreading;
 using MCAutoVote.Web;
-using System;
 
 namespace MCAutoVote.Voting.Modules
 {
@@ -13,7 +13,7 @@ namespace MCAutoVote.Voting.Modules
             ProjectId = projectId;
         }
 
-        public abstract void Vote(string nickname);
+        public abstract void Vote(IContext context);
 
         public abstract string Name { get; }
 
@@ -26,11 +26,11 @@ namespace MCAutoVote.Voting.Modules
         {
             public static void CheckVKUserAuth()
             {
-                Browser b = ApplicationContext.Instance.Container.Browser;
-                if (b.DocumentUrl.Host.ToLower() == "oauth.vk.com")
+                IBrowser b = ApplicationContext.Browser;
+                if (b.Url.Host.ToLower() == "oauth.vk.com")
                 {
                     Text.WriteLine("Waiting user for authorization");
-                    FunctionalUtils.WaitWhile(() => b.DocumentUrl.Host.ToLower() == "oauth.vk.com", 60000, 2000);
+                    MultithreadingUtils.WaitWhile(() => b.Url.Host.ToLower() == "oauth.vk.com", 60000, 2000);
                 }
             }
         }

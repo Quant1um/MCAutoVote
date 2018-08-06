@@ -2,7 +2,7 @@
 using MCAutoVote.Interface.CommandControl;
 using MCAutoVote.Properties;
 using MCAutoVote.Utilities;
-using MCAutoVote.Utilities.Sync;
+using MCAutoVote.Utilities.Multithreading;
 using MCAutoVote.Voting;
 using System;
 using System.Linq;
@@ -114,7 +114,7 @@ namespace MCAutoVote.Interface
             Console.Title = RandomSplash();
             Console.ForegroundColor = ConsoleColor.White;
 
-            ApplicationContext.Instance.Tray.DoubleClick += () => ConsoleHidden = !ConsoleHidden;
+            ApplicationContext.Tray.DoubleClick += () => ConsoleHidden = !ConsoleHidden;
         }
 
         private static void UpdateConsoleState() => ShowWindow(GetConsoleWindow(), ConsoleHidden ? SW_HIDE : SW_SHOW);

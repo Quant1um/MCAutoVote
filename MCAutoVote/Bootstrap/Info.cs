@@ -1,25 +1,22 @@
 ﻿using MCAutoVote.Utilities;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using System.Text;
 
 namespace MCAutoVote.Bootstrap
 {
-    [LoadModule]
     public static class Info
     {
-        static Info()
-        {
-            if (RegistryUtils.Autostart[Name] != ExecutablePath)
-                RegistryUtils.Autostart[Name] = ExecutablePath;
-        }
-
         public static string Name { get; } = "MCAutoVote";
         public static string Version { get; } = "0.1";
         public static string ExecutablePath { get; } = Assembly.GetEntryAssembly().Location;
         public static string ExecutableName { get; } = Path.GetFileName(ExecutablePath);
         public static string Directory { get; } = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), Name);
+
+        public static string FileStacktrace { get; }    = Path.Combine(Directory, "stacktrace.log");
+        public static string FilePreferences { get; }   = Path.Combine(Directory, "prefs.xml");
+        public static string FileState { get; }         = Path.Combine(Directory, "state.xml");
 
         public static bool DevelopmentEnvironment
         {
@@ -37,30 +34,18 @@ namespace MCAutoVote.Bootstrap
         {
             get
             {
-                StringBuilder builder = new StringBuilder();
-                builder.Append(Name);
+                List<String> tokens = new List<string> { Name };
 
-                if (Version != null)
-                {
-                    builder.Append(" v").Append(Version);
-                }
+                if (Version != null) tokens.Add("v" + Version);
+                if (DevelopmentEnvironment) tokens.Add("devenv");
 
-                if (DevelopmentEnvironment)
-                {
-                    if (Version != null)
-                        builder.Append("-");
-                    else
-                        builder.Append(" ");
-                    builder.Append("devenv");
-                }
-
-                return builder.ToString();
+                return string.Join(" ", tokens);
             }
         }
 
         public static bool Autostart
         {
-            get => RegistryUtils.Autostart[Name] == ExecutablePath;
+            get => RegistryUtils.Autostart[Name] != null;
             set => RegistryUtils.Autostart[Name] = value ? ExecutablePath : null;
         }
     }

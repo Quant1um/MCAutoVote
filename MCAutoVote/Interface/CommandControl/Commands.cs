@@ -2,39 +2,17 @@
 using System.Reflection;
 using System.Linq;
 using System.Collections.Generic;
-using MCAutoVote.Interface;
 using System.Configuration;
 using MCAutoVote.Voting;
 using MCAutoVote.Utilities;
-using System.Diagnostics;
+using MCAutoVote.Bootstrap;
 
 namespace MCAutoVote.Interface.CommandControl
 {
+    [LoadModule]
     public static class Commands
     {
-        [AttributeUsage(AttributeTargets.Field, AllowMultiple = true)]
-        public class AliasAttribute : Attribute
-        {
-            public string Alias { get; }
-
-            public AliasAttribute(string alias)
-            {
-                Alias = alias;
-            }
-        }
-
-        [AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
-        public class DescriptionAttribute : Attribute
-        {
-            public string Description { get; }
-
-            public DescriptionAttribute(string desc)
-            {
-                Description = desc;
-            }
-        }
-
-        public static void RegisterAll()
+        static Commands()
         {
             foreach (FieldInfo f in typeof(Commands).GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static).Where(f => f.FieldType == typeof(Command)))
             {
@@ -45,6 +23,28 @@ namespace MCAutoVote.Interface.CommandControl
                 DescriptionAttribute descriptionAttribute = f.GetCustomAttributes(typeof(DescriptionAttribute), false).Cast<DescriptionAttribute>().FirstOrDefault();
                 if (descriptionAttribute != null)
                     CommandRegistry.AddDescription(name, descriptionAttribute.Description);
+            }
+        }
+
+        [AttributeUsage(AttributeTargets.Field, AllowMultiple = true)]
+        private class AliasAttribute : Attribute
+        {
+            public string Alias { get; }
+
+            public AliasAttribute(string alias)
+            {
+                Alias = alias;
+            }
+        }
+
+        [AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
+        private class DescriptionAttribute : Attribute
+        {
+            public string Description { get; }
+
+            public DescriptionAttribute(string desc)
+            {
+                Description = desc;
             }
         }
 
@@ -100,7 +100,8 @@ namespace MCAutoVote.Interface.CommandControl
             if (!tooltipShown)
             {
                 tooltipShown = true;
-                ApplicationContext.Instance.Tray.Bubble("Console interface was hidden! To reveal, double click on tray icon.");
+                ApplicationContext.Tray.Bubble("Console interface was hidden! To reveal, double click on tray icon.");
+                Interface.Text.WriteLine("Console was hidden successfully!", ConsoleColor.Gray);
             }
         };
 

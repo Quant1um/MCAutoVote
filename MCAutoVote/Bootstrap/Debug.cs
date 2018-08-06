@@ -2,6 +2,7 @@
 using System;
 using System.IO;
 using System.Text;
+using System.Windows.Forms;
 
 namespace MCAutoVote.Bootstrap
 {
@@ -10,23 +11,24 @@ namespace MCAutoVote.Bootstrap
     {
         static Debug()
         {
-            AppDomain.CurrentDomain.UnhandledException += OnUnhandledException;
+            AppDomain.CurrentDomain.UnhandledException += (sender, e) => OnUnhandledException(e.ExceptionObject);
+            Application.ThreadException += (sender, e) => OnUnhandledException(e.Exception);
         }
 
         private static bool _exceptionCallbackExecuted = false;
-        private static void OnUnhandledException(object sender, UnhandledExceptionEventArgs e)
+        private static void OnUnhandledException(object e)
         {
             if (_exceptionCallbackExecuted) return;
             _exceptionCallbackExecuted = true;
 
-            if (e.ExceptionObject is Exception ex)
+            if (e is Exception ex)
                 Text.WriteLine("Unhandled exception => {0}", ConsoleColor.DarkRed, ex.Message);
-            else if (e.ExceptionObject != null)
-                Text.WriteLine("Unhandled error => {0}", ConsoleColor.DarkRed, e.ExceptionObject);
+            else if (e != null)
+                Text.WriteLine("Unhandled error => {0}", ConsoleColor.DarkRed, e);
             else
                 Text.WriteLine("Undefined error was occurred!", ConsoleColor.DarkRed);
             
-            WriteErrorToFile(e.ExceptionObject);
+            WriteErrorToFile(e);
         }
 
         private static void WriteErrorToFile(object ex)

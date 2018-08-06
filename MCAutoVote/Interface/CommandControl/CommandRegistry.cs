@@ -6,11 +6,6 @@ namespace MCAutoVote.Interface.CommandControl
     public delegate void Command(string fullCmd, string[] args);
     public static class CommandRegistry
     {
-        static CommandRegistry()
-        {
-            Commands.RegisterAll();
-        }
-
         private static IDictionary<string, Command> commands = new Dictionary<string, Command>();
         private static IDictionary<string, string> aliases = new Dictionary<string, string>();
         private static IDictionary<string, string> descriptions = new Dictionary<string, string>();

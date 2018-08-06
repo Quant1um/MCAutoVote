@@ -1,4 +1,5 @@
 ﻿using MCAutoVote.Bootstrap;
+using MCAutoVote.Web;
 using System;
 using System.Drawing;
 using System.Windows.Forms;
@@ -9,20 +10,15 @@ namespace MCAutoVote
     public class ApplicationContext : System.Windows.Forms.ApplicationContext
     {
         public static ApplicationContext Instance { get; } = new ApplicationContext();
+        public static IBrowser Browser => Instance.Container.Browser;
+        public static TrayManager Tray => Instance.TrayIcon;
 
-        public TrayManager Tray { get; }
+        public TrayManager TrayIcon { get; }
         public ContainerForm Container { get; } 
         
         private ApplicationContext() {
             MainForm = Container = new ContainerForm();
-            Tray = new TrayManager();
-            AppDomain.CurrentDomain.ProcessExit += (sender, e) => Dispose();
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            base.Dispose(disposing);
-            Tray.Dispose(); //TODO: fix ghost tray icon after closing app
+            TrayIcon = new TrayManager();
         }
 
         public class TrayManager : IDisposable

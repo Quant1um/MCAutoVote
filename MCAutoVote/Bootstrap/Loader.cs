@@ -5,6 +5,14 @@ using System.Windows.Forms;
 
 namespace MCAutoVote.Bootstrap
 {
+    /* TODO:
+     *  - command queue (or 'waiter' command)
+     *  - settings (improve)
+     *  - autostart (improve)
+     *  - refactor logging
+     *  - new icon
+     *  - new splashes
+     */
     public class Loader
     {
         private static Thread applicationThread;
