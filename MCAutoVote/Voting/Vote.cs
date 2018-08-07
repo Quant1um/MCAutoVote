@@ -94,7 +94,7 @@ namespace MCAutoVote.Voting
         public static void Do()
         {
             if (!IsNicknameValid)
-                throw new ArgumentException("Please set nickname for voting actions.");
+                throw new ArgumentException("Please set nickname for voting.");
 
             if (actionLock.IsLocked)
                 throw new AbortException("Already in lock!");

@@ -51,7 +51,7 @@ namespace MCAutoVote
             public void Bubble(string message, ToolTipIcon icon = ToolTipIcon.None)
             {
                 if (disposed)
-                    throw new ObjectDisposedException("TrayManager");
+                    throw new ObjectDisposedException(nameof(TrayManager));
 
                 this.icon.BalloonTipIcon = icon;
                 this.icon.BalloonTipText = message;

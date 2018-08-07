@@ -37,7 +37,7 @@ namespace MCAutoVote.Interface
         public static void Run()
         {
             if (running)
-                throw new InvalidOperationException();
+                throw new InvalidOperationException("CLI already running!");
             running = true;
 
             Setup();

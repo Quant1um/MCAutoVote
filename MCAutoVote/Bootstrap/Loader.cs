@@ -7,7 +7,7 @@ namespace MCAutoVote.Bootstrap
 {
     /* TODO:
      *  - command queue (or 'waiter' command)
-     *  - settings (improve)
+     *  - settings (improve) [+]
      *  - autostart (improve)
      *  - refactor logging
      *  - new icon

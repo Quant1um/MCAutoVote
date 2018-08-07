@@ -22,7 +22,7 @@ namespace MCAutoVote.Utilities.Persistency
                 
                 Type = type ?? throw new ArgumentNullException("Type cannot be null!");
 
-                if(!CheckIsTypeValid(def)) throw new ArgumentNullException("Default object is not valid (not assignable to given type)!");
+                if(!CheckIsTypeValid(def)) throw new ArgumentNullException($"Default object is not valid (not assignable to given type: {type.FullName})!");
                 Default = def;
             }
 
@@ -40,7 +40,7 @@ namespace MCAutoVote.Utilities.Persistency
                 get => _value;
                 set {
                     if(!Entry.CheckIsTypeValid(value))
-                        throw new ArgumentNullException("Value object is not valid (not assignable to entry type)");
+                        throw new ArgumentNullException($"Value object is not valid (not assignable to entry type: {Type.FullName})");
                     _value = value;
                 }
             }
@@ -75,7 +75,7 @@ namespace MCAutoVote.Utilities.Persistency
             {
                 if (container.TryGetValue(str, out Property obj))
                     return obj.Value;
-                throw new ArgumentException("Invalid key!");
+                throw new ArgumentException($"Invalid key: {str}!");
             }
 
             set
@@ -85,7 +85,7 @@ namespace MCAutoVote.Utilities.Persistency
                     obj.Value = value;
                     Save();
                 }else
-                    throw new ArgumentException("Invalid key!");
+                    throw new ArgumentException($"Invalid key: {str}!");
             }
         }
 

@@ -88,6 +88,8 @@
     <Compile Include="Interface\CommandControl\Commands.cs" />
     <Compile Include="Interface\Anchor.cs" />
     <Compile Include="Interface\Handlers\ModuleTextHandler.cs" />
+    <Compile Include="Interface\Logging\Level.cs" />
+    <Compile Include="Interface\Logging\Message.cs" />
     <Compile Include="Utilities\Persistency\PersistentContainer.cs" />
     <Compile Include="Utilities\Persistency\Preferences.cs" />
     <Compile Include="Utilities\Persistency\State.cs" />

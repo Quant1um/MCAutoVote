@@ -43,10 +43,10 @@ namespace MCAutoVote.Utilities
         {
             List<string> tokens = new List<string>();
 
-            if (span.Days > 0) tokens.Add(span.Days + " day" + (span.Days > 1 ? "s" : ""));
-            if (span.Hours > 0) tokens.Add(span.Hours + " hour" + (span.Hours > 1 ? "s" : ""));
-            if (span.Minutes > 0) tokens.Add(span.Minutes + " minute" + (span.Minutes > 1 ? "s" : ""));
-            if (span.Seconds > 0) tokens.Add(span.Seconds + " second" + (span.Seconds > 1 ? "s" : ""));
+            if (span.Days > 0)      tokens.Add($"{span.Days} day"       + (span.Days    > 1 ? "s" : ""));
+            if (span.Hours > 0)     tokens.Add($"{span.Hours} hour"     + (span.Hours   > 1 ? "s" : ""));
+            if (span.Minutes > 0)   tokens.Add($"{span.Minutes} minute" + (span.Minutes > 1 ? "s" : ""));
+            if (span.Seconds > 0)   tokens.Add($"{span.Seconds} second" + (span.Seconds > 1 ? "s" : ""));
 
             if (tokens.Count == 0)
                 return null;

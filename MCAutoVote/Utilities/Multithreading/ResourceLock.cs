@@ -36,7 +36,7 @@ namespace MCAutoVote.Utilities.Multithreading
 
         private void AddHandle(Handle handle)
         {
-            if (handle == null) throw new ArgumentNullException();
+            if (handle == null) throw new ArgumentNullException("Resource handle is null!");
 
             lock (syncRoot)
             {
@@ -48,8 +48,8 @@ namespace MCAutoVote.Utilities.Multithreading
 
         private void RemoveHandle(Handle handle)
         {
-            if (handle == null) throw new ArgumentNullException();
-            if (!handles.Contains(handle)) throw new ArgumentException();
+            if (handle == null) throw new ArgumentNullException("Resource handle is null!");
+            if (!handles.Contains(handle)) throw new ArgumentException("Given resource handle not associated with this resource!");
 
             lock (syncRoot)
             {

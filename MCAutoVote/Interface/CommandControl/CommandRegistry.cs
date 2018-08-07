@@ -19,14 +19,14 @@ namespace MCAutoVote.Interface.CommandControl
         public static void AddAlias(string originalName, string alias)
         {
             if (!commands.ContainsKey(originalName))
-                throw new ArgumentException("Command with name " + originalName + " not exists!");
+                throw new ArgumentException($"Command with name {originalName} not exists!");
             aliases.Add(alias, originalName);
         }
 
         public static void AddDescription(string originalName, string description)
         {
             if (!commands.ContainsKey(originalName))
-                throw new ArgumentException("Command with name " + originalName + " not exists!");
+                throw new ArgumentException($"Command with name {originalName} not exists!");
             descriptions.Add(originalName, description);
         }
 

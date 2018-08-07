@@ -37,7 +37,7 @@ namespace MCAutoVote.Interface
                 case ConsoleColor.Magenta:      return ConsoleColor.DarkMagenta;
                 case ConsoleColor.Yellow:       return ConsoleColor.DarkYellow;
                 case ConsoleColor.White:        return ConsoleColor.Gray;
-                default: throw new ArgumentException();
+                default: throw new ArgumentException($"Invalid color supplied: {color}");
             }
         }
     }
