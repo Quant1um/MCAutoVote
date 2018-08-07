@@ -8,15 +8,15 @@ namespace MCAutoVote.Bootstrap
 {
     public static class Info
     {
-        public static string Name { get; } = "MCAutoVote";
-        public static string Version { get; } = "0.1";
-        public static string ExecutablePath { get; } = Assembly.GetEntryAssembly().Location;
-        public static string ExecutableName { get; } = Path.GetFileName(ExecutablePath);
-        public static string Directory { get; } = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), Name);
+        public static string Name { get; }              = "MCAutoVote";
+        public static string Version { get; }           = "0.1";
+        public static string ExecutablePath { get; }    = Assembly.GetEntryAssembly().Location;
+        public static string ExecutableName { get; }    = Path.GetFileName(ExecutablePath);
+        public static string Directory { get; }         = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), Name);
 
         public static string FileStacktrace { get; }    = Path.Combine(Directory, "stacktrace.log");
-        public static string FilePreferences { get; }   = Path.Combine(Directory, "prefs.xml");
-        public static string FileState { get; }         = Path.Combine(Directory, "state.xml");
+        public static string FilePreferences { get; }   = Path.Combine(Directory, "prefs.json");
+        public static string FileState { get; }         = Path.Combine(Directory, "state.json");
 
         public static bool DevelopmentEnvironment
         {

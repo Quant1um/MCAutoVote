@@ -6,6 +6,8 @@ using System.Configuration;
 using MCAutoVote.Voting;
 using MCAutoVote.Utilities;
 using MCAutoVote.Bootstrap;
+using MCAutoVote.Utilities.Persistency;
+using static MCAutoVote.Utilities.Persistency.PersistentContainer;
 
 namespace MCAutoVote.Interface.CommandControl
 {
@@ -128,7 +130,7 @@ namespace MCAutoVote.Interface.CommandControl
                 if (string.IsNullOrEmpty(nick))
                     Text.WriteLine("Nickname isn't set yet");
                 else
-                    Text.WriteLine("Current nickname is '{0}'", Properties.Settings.Default.Nickname);
+                    Text.WriteLine("Current nickname is '{0}'", Preferences.Nickname);
             }
         };
 
@@ -201,8 +203,12 @@ namespace MCAutoVote.Interface.CommandControl
         [Description("Dumps settings.")]
         public static Command DumpSettings = (fullCmd, args) =>
         {
-            foreach(SettingsProperty prop in Properties.Settings.Default.Properties)
-                Text.WriteLine("{0} ({1}) = {2}", prop.Name, prop.PropertyType.Name, Properties.Settings.Default[prop.Name]);
+            Text.WriteLine("- State:");
+            foreach (Property prop in State.Enumerate())
+                Text.WriteLine("{0} ({1}) = {2} [Default: {3}]", ConsoleColor.Gray, prop.Key, prop.Type.FullName, prop.Value ?? "None", prop.Default ?? "None");
+            Text.WriteLine("- Prefs:");
+            foreach (Property prop in Preferences.Enumerate())
+                Text.WriteLine("{0} ({1}) = {2} [Default: {3}]", ConsoleColor.Gray, prop.Key, prop.Type.FullName, prop.Value ?? "None", prop.Default ?? "None");
         };                                                                                                                                                                                                                 
     }
 }

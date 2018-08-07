@@ -54,10 +54,22 @@
   <PropertyGroup>
     <ApplicationIcon>Resources\icon.ico</ApplicationIcon>
   </PropertyGroup>
+  <PropertyGroup>
+    <SignManifests>true</SignManifests>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>MCAutoVoteKeystore.pfx</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="MSHTML">
       <HintPath>lib\MSHTML.dll</HintPath>
       <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net40\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Drawing" />
@@ -76,9 +88,12 @@
     <Compile Include="Interface\CommandControl\Commands.cs" />
     <Compile Include="Interface\Anchor.cs" />
     <Compile Include="Interface\Handlers\ModuleTextHandler.cs" />
-    <Compile Include="Settings.cs" />
+    <Compile Include="Utilities\Persistency\PersistentContainer.cs" />
+    <Compile Include="Utilities\Persistency\Preferences.cs" />
+    <Compile Include="Utilities\Persistency\State.cs" />
     <Compile Include="Utilities\StringUtils.cs" />
     <Compile Include="Utilities\Multithreading\ResourceLock.cs" />
+    <Compile Include="Utilities\TypeUtils.cs" />
     <Compile Include="Voting\Modules\AbortException.cs" />
     <Compile Include="Voting\Modules\IContext.cs" />
     <Compile Include="Voting\Modules\Projects\TopCraftModule.cs" />
@@ -87,11 +102,6 @@
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-    <Compile Include="Properties\Settings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-      <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
     <Compile Include="Utilities\Multithreading\MultithreadingUtils.cs" />
     <Compile Include="Interface\Handlers\DefaultTextHandler.cs" />
@@ -115,10 +125,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
+    <None Include="MCAutoVoteKeystore.pfx" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.6.1">
@@ -139,6 +146,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <None Include="packages.config" />
     <None Include="Resources\Smug.txt" />
   </ItemGroup>
   <ItemGroup>

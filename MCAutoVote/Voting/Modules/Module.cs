@@ -1,5 +1,4 @@
 ﻿using MCAutoVote.Interface;
-using MCAutoVote.Utilities;
 using MCAutoVote.Utilities.Multithreading;
 using MCAutoVote.Web;
 
@@ -24,13 +23,15 @@ namespace MCAutoVote.Voting.Modules
 
         protected static class Utilities
         {
+            private static string OAuthVKHost { get; } = "oauth.vk.com";
+
             public static void CheckVKUserAuth()
             {
                 IBrowser b = ApplicationContext.Browser;
-                if (b.Url.Host.ToLower() == "oauth.vk.com")
+                if (b.Url.Host.ToLower() == OAuthVKHost)
                 {
                     Text.WriteLine("Waiting user for authorization");
-                    MultithreadingUtils.WaitWhile(() => b.Url.Host.ToLower() == "oauth.vk.com", 60000, 2000);
+                    MultithreadingUtils.WaitWhile(() => b.Url.Host.ToLower() == OAuthVKHost, 60000, 2000);
                 }
             }
         }

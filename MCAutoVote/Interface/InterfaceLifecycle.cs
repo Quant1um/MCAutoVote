@@ -3,6 +3,7 @@ using MCAutoVote.Interface.CommandControl;
 using MCAutoVote.Properties;
 using MCAutoVote.Utilities;
 using MCAutoVote.Utilities.Multithreading;
+using MCAutoVote.Utilities.Persistency;
 using MCAutoVote.Voting;
 using System;
 using System.Linq;
@@ -25,9 +26,9 @@ namespace MCAutoVote.Interface
 
         public static bool ConsoleHidden
         {
-            get => Settings.Default.Hidden;
+            get => Preferences.Hidden;
             set {
-                Settings.Default.Hidden = value;
+                Preferences.Hidden = value;
                 UpdateConsoleState();
             }
         }

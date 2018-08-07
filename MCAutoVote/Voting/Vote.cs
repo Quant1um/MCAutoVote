@@ -8,6 +8,7 @@ using MCAutoVote.Bootstrap;
 using System.Collections.Generic;
 using MCAutoVote.Utilities;
 using MCAutoVote.Web;
+using MCAutoVote.Utilities.Persistency;
 
 namespace MCAutoVote.Voting
 {
@@ -37,10 +38,10 @@ namespace MCAutoVote.Voting
 
             public static bool Enabled
             {
-                get => Settings.Default.AutovoteEnabled;
+                get => Preferences.AutovoteEnabled;
                 set
                 {
-                    Settings.Default.AutovoteEnabled = value;
+                    Preferences.AutovoteEnabled = value;
                     UpdateTimerState();
                 }
             }
@@ -49,8 +50,8 @@ namespace MCAutoVote.Voting
 
             public static DateTime LastAction
             {
-                get => Settings.Default.LastAction;
-                set => Settings.Default.LastAction = value;
+                get => State.LastAction;
+                set => State.LastAction = value;
             }
 
             private static void UpdateTimerState()
@@ -76,8 +77,8 @@ namespace MCAutoVote.Voting
 
         public static string Nickname
         {
-            get => Settings.Default.Nickname;
-            set => Settings.Default.Nickname = value;
+            get => Preferences.Nickname;
+            set => Preferences.Nickname = value;
         }
 
         public static bool IsNicknameValid => !StringUtils.IsNullEmptyOrWhitespace(Nickname);
@@ -100,7 +101,7 @@ namespace MCAutoVote.Voting
 
             using (actionLock.Use())
             {
-                Text.WriteLine("Nickname: {0}", ConsoleColor.Cyan, Settings.Default.Nickname);
+                Text.WriteLine("Nickname: {0}", ConsoleColor.Cyan, Nickname);
 
                 using (ApplicationContext.Instance.Container.CreateShowHandle())
                 {

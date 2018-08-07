@@ -42,10 +42,9 @@ namespace MCAutoVote.Bootstrap
                 content.Append(ex.ToString());
             }
 
-            string path = Path.Combine(Info.Directory, "stacktrace.log");
+            string path = Info.FileStacktrace;
             File.WriteAllText(path, content.ToString());
             Text.WriteLine("Error info has been saved to {0}", ConsoleColor.Gray, path);
         }
-
     }
 }

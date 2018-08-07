@@ -1,11 +1,8 @@
 ﻿using MCAutoVote.Interface;
-using MCAutoVote.Utilities;
 using MCAutoVote.Utilities.Multithreading;
 using MCAutoVote.Web;
 using MSHTML;
 using System;
-using System.Linq;
-using System.Windows.Forms;
 
 namespace MCAutoVote.Voting.Modules
 {
