@@ -6,6 +6,7 @@ using System.Configuration;
 using MCAutoVote.Voting;
 using MCAutoVote.Utilities;
 using MCAutoVote.Bootstrap;
+using System.Threading;
 using MCAutoVote.Utilities.Persistency;
 using static MCAutoVote.Utilities.Persistency.PersistentContainer;
 
@@ -118,7 +119,7 @@ namespace MCAutoVote.Interface.CommandControl
             if (args.Length >= 1)
             {
                 string nick = string.Join(" ", args);
-                if (StringUtils.IsNullEmptyOrWhitespace(nick))
+                if (string.IsNullOrWhiteSpace(nick))
                     throw new ArgumentException("Nickname cannot be null, empty or whitespace!");
 
                 Vote.Nickname = nick;
@@ -162,41 +163,29 @@ namespace MCAutoVote.Interface.CommandControl
         };
 
         [Alias("av")]
-        [Description("Sets or gets autovote state. Usage: autovote [enable|on|disable|off]")]
+        [Description("Starts automatical voting. Usage: autovote")]
         public static Command Autovote = (fullCmd, args) =>
         {
-            if (args.Length >= 1)
-            {
-                bool state = StringUtils.ParseState(args[0], new string[] { "enable", "on" }, new string[] { "disable", "off" });
-                Vote.Auto.Enabled = state;
-                Text.Write("Autovote has been ");
-                if (state)
-                    Text.Write("enabled", ConsoleColor.Green);
-                else
-                    Text.Write("disabled", ConsoleColor.Red);
-                Text.WriteLine("!");
-            }
-            else
-            {
-                Text.Write("Autovote is ");
-                if (Vote.Auto.Enabled)
-                    Text.Write("enabled", ConsoleColor.Green);
-                else
-                    Text.Write("disabled", ConsoleColor.Red);
-                Text.WriteLine("!");
+            Text.WriteLine("Autovote started! To stop - press ESCAPE key");
 
-                if (Vote.Auto.Enabled)
-                {
-                    if(!Vote.IsNicknameValid)
-                        Text.WriteLine("Nickname is not valid!", ConsoleColor.DarkRed);
-                    else
-                    {
-                        if (Vote.Auto.UntilAction < TimeSpan.FromMinutes(1))
-                            Text.WriteLine("Less than minute left!", ConsoleColor.Gray);
-                        else
-                            Text.WriteLine("{0} left!", ConsoleColor.Gray, StringUtils.GetTimeString(Vote.Auto.UntilAction));
-                    }          
-                }
+            Anchor anchor = new Anchor();
+            Text.WriteLine();
+
+            bool active = true;
+            while(active)
+            {
+                if (Console.KeyAvailable && Console.ReadKey().Key == ConsoleKey.Escape)
+                    active = false;
+
+                TimeSpan timeLeft = Vote.UntilAction;
+
+                using (anchor.Use())
+                    Text.Write("{0} | {1}", Vote.IsNicknameValid ? ConsoleColor.Cyan : ConsoleColor.Red, Vote.IsNicknameValid ? Vote.Nickname : "Nickname not set", (Vote.IsNicknameValid && timeLeft < TimeSpan.Zero) ? "Voting right now..." : StringUtils.GetTimeString(timeLeft < TimeSpan.Zero ? TimeSpan.Zero : timeLeft) + " left");
+
+                if (Vote.IsNicknameValid && timeLeft < TimeSpan.Zero)
+                    Vote.Do();
+
+                Thread.Sleep(500);
             }
         };
 

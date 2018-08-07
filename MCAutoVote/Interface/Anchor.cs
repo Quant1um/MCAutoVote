@@ -4,6 +4,18 @@ namespace MCAutoVote.Interface
 {
     public class Anchor
     {
+        private class AnchorHandle : IDisposable
+        {
+            private Anchor anchor;
+            public AnchorHandle(Anchor anchor)
+            {
+                this.anchor = anchor.Set();
+            }
+
+            public void Dispose() =>
+                anchor.Set();
+        }
+
         private readonly int left, top;
 
         public Anchor(int left, int top)
@@ -23,5 +35,7 @@ namespace MCAutoVote.Interface
 
             return new Anchor(tempL, tempT);
         }
+
+        public IDisposable Use() => new AnchorHandle(this);
     }
 }

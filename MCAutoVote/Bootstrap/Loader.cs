@@ -13,6 +13,11 @@ namespace MCAutoVote.Bootstrap
      *  - new icon
      *  - new splashes
      *  - refactor cli
+     *  
+     *  - refactor:
+     *      - InterfaceLifecycle
+     *      - Vote
+     *      - ApplicationContext
      */
     public class Loader
     {

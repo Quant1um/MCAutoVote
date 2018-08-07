@@ -18,12 +18,6 @@ namespace MCAutoVote.Utilities.Persistency
             set => container["hidden"] = value;
         }
 
-        public static bool AutovoteEnabled
-        {
-            get => (bool) container["autovote"];
-            set => container["autovote"] = value;
-        }
-
         public static string Nickname
         {
             get => (string) container["nickname"];

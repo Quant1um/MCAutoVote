@@ -30,15 +30,8 @@ namespace MCAutoVote.Interface.CommandControl
             descriptions.Add(originalName, description);
         }
 
-        public static IEnumerable<string> EnumerateCommands()
-        {
-            return commands.Keys;
-        }
-
-        public static IEnumerable<string> EnumerateAliases()
-        {
-            return aliases.Keys;
-        }
+        public static IEnumerable<string> EnumerateCommands() => commands.Keys;
+        public static IEnumerable<string> EnumerateAliases() => aliases.Keys;
 
         public static string GetNameByAlias(string alias)
         {

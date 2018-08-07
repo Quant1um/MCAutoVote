@@ -2,12 +2,10 @@
 using MCAutoVote.Interface.CommandControl;
 using MCAutoVote.Properties;
 using MCAutoVote.Utilities;
-using MCAutoVote.Utilities.Multithreading;
 using MCAutoVote.Utilities.Persistency;
 using MCAutoVote.Voting;
 using System;
 using System.Linq;
-using System.Threading;
 using static MCAutoVote.NativeMethods;
 
 namespace MCAutoVote.Interface
@@ -20,8 +18,6 @@ namespace MCAutoVote.Interface
             UpdateConsoleState();
         }
 
-        //mutex used for disallowing to run console commands and autovote at the same time
-        public static Mutex OperationMutex { get; } = new Mutex();
         public static Random Random { get; } = new Random();
 
         public static bool ConsoleHidden
@@ -49,31 +45,30 @@ namespace MCAutoVote.Interface
                 Text.Write("> ", ConsoleColor.Green);
                 string query = Console.ReadLine();
 
-                using (OperationMutex.Use())
+                if (string.IsNullOrWhiteSpace(query))
                 {
-                    if (StringUtils.IsNullEmptyOrWhitespace(query))
-                    {
-                        anchor.Set();
-                        continue;
-                    }
+                    anchor.Set();
+                    continue;
+                }
 
-                    Console.SetCursorPosition(0, Console.CursorTop - 1);
-                    Text.Write("> ", ConsoleColor.Gray);
-                    Text.Write(query + " ");
-                    anchor = new Anchor();
-                    Text.WriteLine();
+                Console.SetCursorPosition(0, Console.CursorTop - 1);
+                Text.Write("> ", ConsoleColor.Gray);
+                Text.Write(query + " ");
+                anchor = new Anchor();
+                Text.WriteLine();
 
-                    string[] splittedQuery = query.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                    if (splittedQuery.Length == 0) continue;
-                    string command = splittedQuery[0].ToLower();
+                string[] splittedQuery = query.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                if (splittedQuery.Length == 0) continue;
+                string command = splittedQuery[0].ToLower();
 
-                    Command deleg = CommandRegistry.GetCommandByAlias(command);
-                    if (deleg != null)
+                Command deleg = CommandRegistry.GetCommandByAlias(command);
+                if (deleg != null)
+                {
 #if !DEBUG
                     try
                     {
 #endif
-                        deleg(query, splittedQuery.Skip(1).ToArray());
+                    deleg(query, splittedQuery.Skip(1).ToArray());
 #if !DEBUG
                     }
                     catch (Exception e)
@@ -83,9 +78,11 @@ namespace MCAutoVote.Interface
                         back.Set();
                     }
 #endif
-                    else
+                }
+                else
+                {
+                    using (anchor.Use())
                     {
-                        Anchor back = anchor.Set();
                         Text.Write("=> No such command!", ConsoleColor.DarkRed);
 
                         int dist = int.MaxValue;
@@ -103,7 +100,6 @@ namespace MCAutoVote.Interface
 
                         if (dist <= 3 && min != null)
                             Text.Write(" Did you mean '{0}'?", ConsoleColor.DarkRed, min);
-                        back.Set();
                     }
                 }
             }
@@ -127,8 +123,6 @@ namespace MCAutoVote.Interface
             Text.WriteLine(@"Write 'help' to list all supported commands.");
             if (!Info.Autostart)
                 Text.WriteLine("Autostart disabled! You can enable it using 'autostart enable' command, if you want.", ConsoleColor.DarkYellow);
-            if (!Vote.Auto.Enabled)
-                Text.WriteLine("Autovote disabled! You can enable it using 'autovote enable' command, if you want.", ConsoleColor.DarkYellow);
             if (!Vote.IsNicknameValid)
                 Text.WriteLine("Nickname is not set! You can set it using 'nickname <nickname>' command, if you want.", ConsoleColor.DarkYellow);
         }
