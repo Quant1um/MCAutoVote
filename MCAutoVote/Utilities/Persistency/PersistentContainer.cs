@@ -122,8 +122,6 @@ namespace MCAutoVote.Utilities.Persistency
                 foreach (Property prop in this)
                 {
                     string key = prop.Key;
-                    Type type = prop.Type;
-
                     obj.Add(new JProperty(key, prop.Value));
                 }
 

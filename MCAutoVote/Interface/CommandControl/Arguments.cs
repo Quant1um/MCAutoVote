@@ -7,7 +7,7 @@ namespace MCAutoVote.Interface.CommandControl
     public class Arguments
     {
         public static char[] CommandSeparators { get; } = { ' ', '\t' };
-        public static Regex FlagExpression = new Regex("^-(.*)", RegexOptions.IgnoreCase);
+        public static Regex FlagExpression { get; } = new Regex("^-(.*)", RegexOptions.IgnoreCase);
 
         private readonly List<string> arguments = new List<string>();
         private readonly ISet<string> flags = new HashSet<string>();

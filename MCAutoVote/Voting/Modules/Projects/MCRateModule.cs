@@ -21,7 +21,7 @@ namespace MCAutoVote.Voting.Modules
             int attempts = 0;
             start:
             if (++attempts > MaxLoops)
-                throw new Exception("Too many loops! Is it a timer bug?");
+                throw new InvalidProgramException("Too many loops! Is it a timer bug?");
 
             IBrowser b = context.Browser;
             b.Navigate($"http://mcrate.su/project/{ProjectId}");

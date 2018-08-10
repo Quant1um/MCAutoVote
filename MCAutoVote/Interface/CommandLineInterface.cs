@@ -32,8 +32,7 @@ namespace MCAutoVote.Interface
                     continue;
                 }
 
-                ConsoleWindow.CursorLeft = 0;
-                ConsoleWindow.CursorTop = ConsoleWindow.CursorTop - 1;
+                anchor.Set();
                 Text.Write("> ", ConsoleColor.Gray);
                 Text.Write(query + " ");
                 anchor = new Anchor();

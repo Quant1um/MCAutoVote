@@ -19,7 +19,7 @@ namespace MCAutoVote.Voting.Modules
             int attempts = 0;
             start:
             if (++attempts > MaxLoops)
-                throw new Exception("Too many loops. Is it an authirization bug?");
+                throw new InvalidProgramException("Too many loops. Is it an authirization bug?");
 
             IBrowser b = context.Browser;
             b.Navigate(Url);
