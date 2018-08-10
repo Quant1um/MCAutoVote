@@ -18,17 +18,12 @@ namespace MCAutoVote.Bootstrap
         public static string FilePreferences { get; }   = Path.Combine(Directory, "prefs.json");
         public static string FileState { get; }         = Path.Combine(Directory, "state.json");
 
-        public static bool DevelopmentEnvironment
-        {
-            get
-            {
+        public static bool DevelopmentEnvironment =>
 #if DEBUG
-                return true;
+                true;
 #else
-                return false;
+                false;
 #endif
-            }
-        }
 
         public static string FullName
         {

@@ -1,12 +1,18 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace MCAutoVote
+namespace MCAutoVote.Utilities
 {
     public static class NativeMethods
     {
         [DllImport("kernel32.dll")]
         public static extern IntPtr GetConsoleWindow();
+
+        [DllImport("kernel32.dll")]
+        public static extern bool AttachConsole(int pid);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        public static extern bool AllocConsole();
 
         [DllImport("user32.dll")]
         public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);

@@ -46,7 +46,7 @@ namespace MCAutoVote.Voting.Modules
 
                 Text.WriteLine("Validating");
                 IHTMLElement tooltip = null;
-                MultithreadingUtils.WaitWhile(() => (tooltip = b.QuerySelector(".tooltip-inner")) == null, 5600, 800);
+                MultithreadingUtils.WaitWhile(() => (tooltip = b.QuerySelector(".tooltip-inner")) == null, 15600, 800);
                 if (tooltip.innerText == "Сегодня Вы уже голосовали")
                     throw new AbortException("Already voted! ^.^");
             }

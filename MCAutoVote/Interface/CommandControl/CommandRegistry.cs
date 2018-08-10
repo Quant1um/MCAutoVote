@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace MCAutoVote.Interface.CommandControl
 {
-    public delegate void Command(string fullCmd, string[] args);
+    public delegate void Command(Arguments args);
     public static class CommandRegistry
     {
         private static IDictionary<string, Command> commands = new Dictionary<string, Command>();

@@ -10,17 +10,17 @@ namespace MCAutoVote.Interface
 
         public void Write(string str, ConsoleColor color, params object[] parameters)
         {
-            Console.ForegroundColor = color;
+            ConsoleWindow.Foreground = color;
             WriteNoColor(str, parameters);
-            Console.ForegroundColor = ConsoleColor.White;
+            ConsoleWindow.Foreground = ConsoleColor.White;
         }
 
-        public void WriteNoColor(string str, object[] parameters)
+        public static void WriteNoColor(string str, object[] parameters)
         {
             string formatted = str;
             if (parameters != null && parameters.Length > 0)
                 formatted = string.Format(str, parameters);
-            Console.Write(formatted);
+            ConsoleWindow.Write(formatted);
         }
     }
 }

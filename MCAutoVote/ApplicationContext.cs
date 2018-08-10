@@ -3,7 +3,6 @@ using MCAutoVote.Web;
 using System;
 using System.Drawing;
 using System.Windows.Forms;
-using static MCAutoVote.Web.Browser;
 
 namespace MCAutoVote
 {
@@ -17,7 +16,9 @@ namespace MCAutoVote
         public ContainerForm Container { get; } 
         
         private ApplicationContext() {
-            MainForm = Container = new ContainerForm();
+            Container = new ContainerForm();
+            MainForm = Container;
+
             TrayIcon = new TrayManager();
         }
 

@@ -8,7 +8,6 @@ namespace MCAutoVote.Utilities.Persistency
     {
         private static readonly PersistentContainer container = new PersistentContainer(Info.FilePreferences, new Entry[] {
             new Entry("hidden",     typeof(bool),   false),
-            new Entry("autovote",   typeof(bool),   true),
             new Entry("nickname",   typeof(string), null)
         });
 

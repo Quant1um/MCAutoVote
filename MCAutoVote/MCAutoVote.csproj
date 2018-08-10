@@ -85,14 +85,13 @@
     <Compile Include="Bootstrap\Info.cs" />
     <Compile Include="Bootstrap\LoadModuleAttribute.cs" />
     <Compile Include="Bootstrap\Debug.cs" />
+    <Compile Include="Interface\CommandControl\Arguments.cs" />
     <Compile Include="Interface\CommandControl\CommandRegistry.cs" />
-    <Compile Include="Interface\InterfaceLifecycle.cs" />
+    <Compile Include="Interface\CommandLineInterface.cs" />
     <Compile Include="Interface\CommandControl\Commands.cs" />
     <Compile Include="Interface\Anchor.cs" />
+    <Compile Include="Interface\ConsoleWindow.cs" />
     <Compile Include="Interface\Handlers\ModuleTextHandler.cs" />
-    <Compile Include="Interface\Logging\Level.cs" />
-    <Compile Include="Interface\Logging\Logger.cs" />
-    <Compile Include="Interface\Logging\Message.cs" />
     <Compile Include="Utilities\Persistency\PersistentContainer.cs" />
     <Compile Include="Utilities\Persistency\Preferences.cs" />
     <Compile Include="Utilities\Persistency\State.cs" />
@@ -102,7 +101,7 @@
     <Compile Include="Voting\Modules\AbortException.cs" />
     <Compile Include="Voting\Modules\IContext.cs" />
     <Compile Include="Voting\Modules\Projects\TopCraftModule.cs" />
-    <Compile Include="NativeMethods.cs" />
+    <Compile Include="Utilities\NativeMethods.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -116,7 +115,7 @@
     <Compile Include="Voting\Modules\Projects\MCTopModule.cs" />
     <Compile Include="Voting\Modules\Module.cs" />
     <Compile Include="Voting\Modules\Projects\AbstractTCBasedModule.cs" />
-    <Compile Include="Bootstrap\Loader.cs" />
+    <Compile Include="Bootstrap\Startup.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utilities\RegistryUtils.cs" />
     <Compile Include="Voting\Vote.cs" />

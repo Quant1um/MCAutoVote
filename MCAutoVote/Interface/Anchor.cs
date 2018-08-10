@@ -24,14 +24,14 @@ namespace MCAutoVote.Interface
             this.top = top;
         }
 
-        public Anchor() : this(Console.CursorLeft, Console.CursorTop) { }
+        public Anchor() : this(ConsoleWindow.CursorLeft, ConsoleWindow.CursorTop) { }
 
         public Anchor Set()
         {
-            int tempL = Console.CursorLeft;
-            int tempT = Console.CursorTop;
-            Console.CursorLeft = left;
-            Console.CursorTop = top;
+            int tempL = ConsoleWindow.CursorLeft;
+            int tempT = ConsoleWindow.CursorTop;
+            ConsoleWindow.CursorLeft = left;
+            ConsoleWindow.CursorTop = top;
 
             return new Anchor(tempL, tempT);
         }

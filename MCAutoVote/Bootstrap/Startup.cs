@@ -1,12 +1,13 @@
 ﻿using MCAutoVote.Interface;
 using System;
+using System.Globalization;
 using System.Threading;
 using System.Windows.Forms;
 
 namespace MCAutoVote.Bootstrap
 {
     /* TODO:
-     *  - command queue (or 'waiter' command)
+     *  - command queue (or 'waiter' command) [+]
      *  - settings (improve) [+]
      *  - autostart (improve)
      *  - refactor logging
@@ -19,23 +20,24 @@ namespace MCAutoVote.Bootstrap
      *      - Vote
      *      - ApplicationContext
      */
-    public class Loader
+    public class Startup
     {
-        private static Thread applicationThread;
-
         [STAThread]
         private static void Main(string[] args)
         {
+            //setting culture to invariant
+            Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
+
             //load all modules
-            LoadModuleAttribute.LoadAll(); 
+            LoadModuleAttribute.LoadAll();
 
             //run win32 application thread
-            applicationThread = new Thread(() => Application.Run(ApplicationContext.Instance)) { IsBackground = true };
+            Thread applicationThread = new Thread(() => Application.Run(ApplicationContext.Instance)) { IsBackground = true };
             applicationThread.SetApartmentState(ApartmentState.STA);
             applicationThread.Start();
 
             //run console interface
-            InterfaceLifecycle.Run();
+            CommandLineInterface.Run();
         }
     }
 }

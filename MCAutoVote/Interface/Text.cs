@@ -13,6 +13,6 @@ namespace MCAutoVote.Interface
         public static void WriteLine(string str, ConsoleColor color, params object[] parameters) => Write(str + Environment.NewLine, color, parameters);
         public static void WriteLine(string str, params object[] parameters) => WriteLine(str, ConsoleColor.White, parameters);
         public static void WriteLine(string str) => WriteLine(str, ConsoleColor.White);
-        public static void WriteLine() => Console.WriteLine();
+        public static void WriteLine() => Write(Environment.NewLine);
     }
 }

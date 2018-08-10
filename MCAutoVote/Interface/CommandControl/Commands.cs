@@ -2,7 +2,6 @@
 using System.Reflection;
 using System.Linq;
 using System.Collections.Generic;
-using System.Configuration;
 using MCAutoVote.Voting;
 using MCAutoVote.Utilities;
 using MCAutoVote.Bootstrap;
@@ -54,7 +53,7 @@ namespace MCAutoVote.Interface.CommandControl
         [Alias("commands")]
         [Alias("cmds")]
         [Description("Prints out all supported commands.")]
-        public static Command Help = (full, args) =>
+        private static readonly Command help = (args) =>
         {
             IDictionary<string, List<string>> aliases = new Dictionary<string, List<string>>();
             foreach (string alias in CommandRegistry.EnumerateAliases())
@@ -78,17 +77,17 @@ namespace MCAutoVote.Interface.CommandControl
         [Alias("clean")]
         [Alias("vanish")]
         [Description("Clears all contents of console interface.")]
-        public static Command Clear = (fullCmd, args) => Console.Clear();
+        private static readonly Command clear = (args) => ConsoleWindow.Clear();
 
         [Alias("q")]
         [Alias("quit")]
         [Alias("shutdown")]
         [Alias("leave")]
         [Description("Kills command interface and returns to your OS.")]
-        public static Command Exit = (fullCmd, args) => Environment.Exit(0);
+        private static readonly Command exit = (args) => Environment.Exit(0);
 
-        [Description("Prints out something...")]
-        public static Command Smug = (fullCmd, args) =>
+        [Description("Prints out smug anime girl's face")]
+        private static readonly Command smug = (args) =>
         {
             Text.WriteLine(Properties.Resources.Smug);
         };
@@ -96,9 +95,9 @@ namespace MCAutoVote.Interface.CommandControl
         private static bool tooltipShown = false;
         [Alias("h")]
         [Description("Hides the console interface (Double-click to tray icon to show console again).")]
-        public static Command Hide = (fullCmd, args) =>
+        private static readonly Command hide = (args) =>
         {
-            InterfaceLifecycle.ConsoleHidden = true;
+            ConsoleWindow.Hidden = true;
 
             if (!tooltipShown)
             {
@@ -110,15 +109,15 @@ namespace MCAutoVote.Interface.CommandControl
 
         [Alias("vote")]
         [Description("Forces to apply voting actions immediately.")]
-        public static Command ForceVote = (fullCmd, args) => Vote.Do();
+        private static readonly Command forceVote = (args) => Vote.Do();
 
         [Alias("nick")]
         [Description("Sets or gets nickname for voting actions. Required. Usage: nickname [nick]")]
-        public static Command Nickname = (fullCmd, args) =>
+        private static readonly Command nickname = (args) =>
         {
-            if (args.Length >= 1)
+            if (!string.IsNullOrEmpty(args.ArgQuery))
             {
-                string nick = string.Join(" ", args);
+                string nick = args.ArgQuery;
                 if (string.IsNullOrWhiteSpace(nick))
                     throw new ArgumentException("Nickname cannot be null, empty or whitespace!");
 
@@ -131,13 +130,13 @@ namespace MCAutoVote.Interface.CommandControl
                 if (string.IsNullOrEmpty(nick))
                     Text.WriteLine("Nickname isn't set yet");
                 else
-                    Text.WriteLine("Current nickname is '{0}'", Preferences.Nickname);
+                    Text.WriteLine("Current nickname is '{0}'", Vote.Nickname);
             }
         };
 
         [Alias("as")]
         [Description("Sets or gets autostart state. Usage: autostart [enable|on|disable|off]")]
-        public static Command Autostart = (fullCmd, args) =>
+        private static readonly Command autostart = (args) =>
         {
             if (args.Length >= 1)
             {
@@ -164,7 +163,7 @@ namespace MCAutoVote.Interface.CommandControl
 
         [Alias("av")]
         [Description("Starts automatical voting. Usage: autovote")]
-        public static Command Autovote = (fullCmd, args) =>
+        private static readonly Command autovote = (args) =>
         {
             Text.WriteLine("Autovote started! To stop - press ESCAPE key");
 
@@ -174,7 +173,8 @@ namespace MCAutoVote.Interface.CommandControl
             bool active = true;
             while(active)
             {
-                if (Console.KeyAvailable && Console.ReadKey().Key == ConsoleKey.Escape)
+                ConsoleKeyInfo? key = ConsoleWindow.ReadKeyIfAvailable();
+                if (key.HasValue && key.Value.Key == ConsoleKey.Escape)
                     active = false;
 
                 TimeSpan timeLeft = Vote.UntilAction;
@@ -189,15 +189,15 @@ namespace MCAutoVote.Interface.CommandControl
             }
         };
 
-        [Description("Dumps settings.")]
-        public static Command DumpSettings = (fullCmd, args) =>
+        [Description("Dumps preferences & state")]
+        private static readonly Command dump = (args) =>
         {
             Text.WriteLine("- State:");
             foreach (Property prop in State.Enumerate())
-                Text.WriteLine("{0} ({1}) = {2} [Default: {3}]", ConsoleColor.Gray, prop.Key, prop.Type.FullName, prop.Value ?? "None", prop.Default ?? "None");
+                Text.WriteLine("    {0} ({1}) = {2} [Default: {3}]", ConsoleColor.Gray, prop.Key, prop.Type.FullName, prop.Value ?? "None", prop.Default ?? "None");
             Text.WriteLine("- Prefs:");
             foreach (Property prop in Preferences.Enumerate())
-                Text.WriteLine("{0} ({1}) = {2} [Default: {3}]", ConsoleColor.Gray, prop.Key, prop.Type.FullName, prop.Value ?? "None", prop.Default ?? "None");
+                Text.WriteLine("    {0} ({1}) = {2} [Default: {3}]", ConsoleColor.Gray, prop.Key, prop.Type.FullName, prop.Value ?? "None", prop.Default ?? "None");
         };                                                                                                                                                                                                                 
     }
 }

@@ -2,33 +2,14 @@
 using MCAutoVote.Interface.CommandControl;
 using MCAutoVote.Properties;
 using MCAutoVote.Utilities;
-using MCAutoVote.Utilities.Persistency;
 using MCAutoVote.Voting;
 using System;
-using System.Linq;
-using static MCAutoVote.NativeMethods;
+using System.Threading;
 
 namespace MCAutoVote.Interface
 {
-    [LoadModule]
-    public static class InterfaceLifecycle
+    public static class CommandLineInterface
     {
-        static InterfaceLifecycle()
-        {
-            UpdateConsoleState();
-        }
-
-        public static Random Random { get; } = new Random();
-
-        public static bool ConsoleHidden
-        {
-            get => Preferences.Hidden;
-            set {
-                Preferences.Hidden = value;
-                UpdateConsoleState();
-            }
-        }
-
         private static bool running = false;
         public static void Run()
         {
@@ -43,7 +24,7 @@ namespace MCAutoVote.Interface
             {
                 Anchor anchor = new Anchor();
                 Text.Write("> ", ConsoleColor.Green);
-                string query = Console.ReadLine();
+                string query = ConsoleWindow.ReadLine();
 
                 if (string.IsNullOrWhiteSpace(query))
                 {
@@ -51,24 +32,22 @@ namespace MCAutoVote.Interface
                     continue;
                 }
 
-                Console.SetCursorPosition(0, Console.CursorTop - 1);
+                ConsoleWindow.CursorLeft = 0;
+                ConsoleWindow.CursorTop = ConsoleWindow.CursorTop - 1;
                 Text.Write("> ", ConsoleColor.Gray);
                 Text.Write(query + " ");
                 anchor = new Anchor();
                 Text.WriteLine();
 
-                string[] splittedQuery = query.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                if (splittedQuery.Length == 0) continue;
-                string command = splittedQuery[0].ToLower();
-
-                Command deleg = CommandRegistry.GetCommandByAlias(command);
+                Arguments args = new Arguments(query);
+                Command deleg = CommandRegistry.GetCommandByAlias(args.Command);
                 if (deleg != null)
                 {
 #if !DEBUG
                     try
                     {
 #endif
-                    deleg(query, splittedQuery.Skip(1).ToArray());
+                    deleg(args);
 #if !DEBUG
                     }
                     catch (Exception e)
@@ -90,7 +69,7 @@ namespace MCAutoVote.Interface
 
                         foreach (string alias in CommandRegistry.EnumerateAliases())
                         {
-                            int dd = StringUtils.EditDistance(command, alias);
+                            int dd = StringUtils.EditDistance(args.Command, alias);
                             if (dd < dist)
                             {
                                 dist = dd;
@@ -107,14 +86,11 @@ namespace MCAutoVote.Interface
 
         private static void Setup()
         {
-            UpdateConsoleState();
-            Console.Title = RandomSplash();
-            Console.ForegroundColor = ConsoleColor.White;
+            ConsoleWindow.Title = RandomSplash();
+            ConsoleWindow.Foreground = ConsoleColor.White;
 
-            ApplicationContext.Tray.DoubleClick += () => ConsoleHidden = !ConsoleHidden;
+            ApplicationContext.Tray.DoubleClick += () => ConsoleWindow.Hidden = !ConsoleWindow.Hidden;
         }
-
-        private static void UpdateConsoleState() => ShowWindow(GetConsoleWindow(), ConsoleHidden ? SW_HIDE : SW_SHOW);
 
         private static void Welcome()
         {

@@ -11,10 +11,10 @@ namespace MCAutoVote.Interface
 
         public void Write(string str, ConsoleColor color, params object[] parameters)
         {
-            Console.ForegroundColor = Darker(color);
-            Console.Write(Indent);
-            DefaultTextHandler.Instance.WriteNoColor(str, parameters);
-            Console.ForegroundColor = ConsoleColor.White;
+            ConsoleWindow.Foreground = Darker(color);
+            ConsoleWindow.Write(Indent);
+            DefaultTextHandler.WriteNoColor(str, parameters);
+            ConsoleWindow.Foreground = ConsoleColor.White;
         }
 
         private static ConsoleColor Darker(ConsoleColor color)
