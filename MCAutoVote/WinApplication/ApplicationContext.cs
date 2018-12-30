@@ -1,4 +1,5 @@
 ﻿using MCAutoVote.Bootstrap;
+using MCAutoVote.CLI;
 using System;
 using System.Drawing;
 using System.Windows.Forms;
@@ -17,6 +18,7 @@ namespace MCAutoVote
             MainForm = Container = new ContainerForm();
             Tray = new TrayManager();
             AppDomain.CurrentDomain.ProcessExit += (sender, e) => Dispose();
+            Tray.DoubleClick += () => CLIWindow.Hidden = !CLIWindow.Hidden;
         }
 
         protected override void Dispose(bool disposing)

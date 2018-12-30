@@ -1,4 +1,4 @@
-﻿using MCAutoVote.Interface;
+﻿using MCAutoVote.CLI;
 using MCAutoVote.Utilities;
 using MCAutoVote.Web;
 using System;
@@ -30,7 +30,7 @@ namespace MCAutoVote.Voting.Modules
             b.Navigate($"http://mcrate.su/project/{ProjectId}");
             b.WaitComplete();
 
-            Text.WriteLine("Opening auth page");
+            CLIOutput.WriteLine("Opening auth page");
             b.Document.All
                       .GetElementsByClass("fa-thumbs-o-up")
                       .First()
@@ -38,7 +38,7 @@ namespace MCAutoVote.Voting.Modules
 
             b.WaitComplete();
 
-            Text.WriteLine("Authorizing");
+            CLIOutput.WriteLine("Authorizing");
             b.Document.All
                       .GetElementsByClass("vk_authorization")
                       .First()
@@ -48,7 +48,7 @@ namespace MCAutoVote.Voting.Modules
             Utilities.CheckVKUserAuth();
             b.WaitComplete();
 
-            Text.WriteLine("Performing checks");
+            CLIOutput.WriteLine("Performing checks");
             HtmlElement elem = b.Document.All
                                          .GetElementsByName("login_player")
                                          .Cast<HtmlElement>()
@@ -76,9 +76,9 @@ namespace MCAutoVote.Voting.Modules
                 else
                     throw new AbortException("Already voted! ^.^ Please wait for " + StringUtils.GetTimeString(span) + ".");
             }
-                
 
-            Text.WriteLine("Voting for {0}", nickname);
+
+            CLIOutput.WriteLine("Voting for {0}", nickname);
             elem.InnerText = nickname;
             b.Document.GetElementById("buttonrate")
                       .InvokeMember("click");

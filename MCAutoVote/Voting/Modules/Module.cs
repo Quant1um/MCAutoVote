@@ -1,4 +1,4 @@
-﻿using MCAutoVote.Interface;
+﻿using MCAutoVote.CLI;
 using MCAutoVote.Utilities;
 using MCAutoVote.Web;
 using System;
@@ -29,7 +29,7 @@ namespace MCAutoVote.Voting.Modules
                 Browser b = ApplicationContext.Instance.Container.Browser;
                 if (b.DocumentUrl.Host.ToLower() == "oauth.vk.com")
                 {
-                    Text.WriteLine("Waiting user for authorization");
+                    CLIOutput.WriteLine("Waiting user for authorization");
                     FunctionalUtils.WaitWhile(() => b.DocumentUrl.Host.ToLower() == "oauth.vk.com", 60000, 2000);
                 }
             }

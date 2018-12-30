@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace MCAutoVote.Interface.CommandControl
+namespace MCAutoVote.CLI.Command
 {
     public delegate void Command(string fullCmd, string[] args);
     public static class CommandRegistry
     {
+        public static AutocompletionHandler Autocompletion { get; } = new AutocompletionHandler();
+
         static CommandRegistry()
         {
             Commands.RegisterAll();
@@ -64,6 +66,25 @@ namespace MCAutoVote.Interface.CommandControl
             if (descriptions.TryGetValue(name, out string desc))
                 return desc;
             return null;
+        }
+
+        public class AutocompletionHandler : IAutoCompleteHandler
+        {
+            public char[] Separators { get; set; } = new char[] { ' ' };
+
+            public string[] GetSuggestions(string text, int index)
+            {
+                List<string> suggestions = new List<string>();
+                foreach(string alias in EnumerateAliases())
+                {
+                    if (alias.ToLowerInvariant().StartsWith(text))
+                    {
+                        suggestions.Add(alias);
+                    }
+                }
+
+                return suggestions.ToArray();
+            }
         }
     }
 }

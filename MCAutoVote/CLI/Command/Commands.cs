@@ -2,13 +2,12 @@
 using System.Reflection;
 using System.Linq;
 using System.Collections.Generic;
-using MCAutoVote.Interface;
 using System.Configuration;
 using MCAutoVote.Voting;
 using MCAutoVote.Utilities;
-using System.Diagnostics;
+using Newtonsoft.Json;
 
-namespace MCAutoVote.Interface.CommandControl
+namespace MCAutoVote.CLI.Command
 {
     public static class Commands
     {
@@ -64,9 +63,9 @@ namespace MCAutoVote.Interface.CommandControl
 
             foreach (string name in aliases.Keys)
             {
-                Text.Write(string.Join(", ", aliases[name].ToArray()), ConsoleColor.Yellow);
-                Text.Write(" - ");
-                Text.WriteLine(CommandRegistry.GetDescriptionByName(name) ?? "<No Description Provided>");
+                CLIOutput.Write(string.Join(", ", aliases[name].ToArray()), ConsoleColor.Yellow);
+                CLIOutput.Write(" - ");
+                CLIOutput.WriteLine(CommandRegistry.GetDescriptionByName(name) ?? "<No Description Provided>");
             }
         };
 
@@ -84,29 +83,30 @@ namespace MCAutoVote.Interface.CommandControl
         [Description("Kills command interface and returns to your OS.")]
         public static Command Exit = (fullCmd, args) => Environment.Exit(0);
 
-        [Description("Prints out something...")]
+        [Description("smug")]
         public static Command Smug = (fullCmd, args) =>
         {
-            Text.WriteLine(Properties.Resources.Smug);
+            CLIOutput.WriteLine(Properties.Resources.Smug);
         };
 
         private static bool tooltipShown = false;
         [Alias("h")]
+        [Alias("hh")] //f
         [Description("Hides the console interface (Double-click to tray icon to show console again).")]
         public static Command Hide = (fullCmd, args) =>
         {
-            InterfaceLifecycle.ConsoleHidden = true;
+            CLIWindow.Hidden = true;
 
             if (!tooltipShown)
             {
                 tooltipShown = true;
-                ApplicationContext.Instance.Tray.Bubble("Console interface was hidden! To reveal, double click on tray icon.");
+                CLITray.Bubble("Console interface was hidden! To reveal, double click on tray icon.");
             }
         };
 
         [Alias("vote")]
         [Description("Forces to apply voting actions immediately.")]
-        public static Command ForceVote = (fullCmd, args) => Vote.Do();
+        public static Command ForceVote = (fullCmd, args) => VoteLoop.Vote();
 
         [Alias("nick")]
         [Description("Sets or gets nickname for voting actions. Required. Usage: nickname [nick]")]
@@ -118,16 +118,16 @@ namespace MCAutoVote.Interface.CommandControl
                 if (StringUtils.IsNullEmptyOrWhitespace(nick))
                     throw new ArgumentException("Nickname cannot be null, empty or whitespace!");
 
-                Vote.Nickname = nick;
-                Text.WriteLine("Nickname has been set to '{0}'", nick);
+                VoteLoop.Nickname = nick;
+                CLIOutput.WriteLine("Nickname has been set to '{0}'", nick);
             }
             else
             {
-                string nick = Vote.Nickname;
+                string nick = VoteLoop.Nickname;
                 if (string.IsNullOrEmpty(nick))
-                    Text.WriteLine("Nickname isn't set yet");
+                    CLIOutput.WriteLine("Nickname isn't set yet");
                 else
-                    Text.WriteLine("Current nickname is '{0}'", Properties.Settings.Default.Nickname);
+                    CLIOutput.WriteLine("Current nickname is '{0}'", VoteLoop.Nickname);
             }
         };
 
@@ -140,21 +140,21 @@ namespace MCAutoVote.Interface.CommandControl
                 bool state = StringUtils.ParseState(args[0], new string[] { "enable", "on" }, new string[] { "disable", "off" });
                 Bootstrap.Info.Autostart = state;
 
-                Text.Write("Autostart has been ");
+                CLIOutput.Write("Autostart has been ");
                 if (state)
-                    Text.Write("enabled", ConsoleColor.Green);
+                    CLIOutput.Write("enabled", ConsoleColor.Green);
                 else
-                    Text.Write("disabled", ConsoleColor.Red);
-                Text.WriteLine("!");
+                    CLIOutput.Write("disabled", ConsoleColor.Red);
+                CLIOutput.WriteLine("!");
             }
             else
             {
-                Text.Write("Autostart is ");
+                CLIOutput.Write("Autostart is ");
                 if (Bootstrap.Info.Autostart)
-                    Text.Write("enabled", ConsoleColor.Green);
+                    CLIOutput.Write("enabled", ConsoleColor.Green);
                 else
-                    Text.Write("disabled", ConsoleColor.Red);
-                Text.WriteLine("!");
+                    CLIOutput.Write("disabled", ConsoleColor.Red);
+                CLIOutput.WriteLine("!");
             }
         };
 
@@ -165,34 +165,26 @@ namespace MCAutoVote.Interface.CommandControl
             if (args.Length >= 1)
             {
                 bool state = StringUtils.ParseState(args[0], new string[] { "enable", "on" }, new string[] { "disable", "off" });
-                Vote.Auto.Enabled = state;
-                Text.Write("Autovote has been ");
+                VoteLoop.Enabled = state;
+                CLIOutput.Write("Autovote has been ");
                 if (state)
-                    Text.Write("enabled", ConsoleColor.Green);
+                    CLIOutput.Write("enabled", ConsoleColor.Green);
                 else
-                    Text.Write("disabled", ConsoleColor.Red);
-                Text.WriteLine("!");
+                    CLIOutput.Write("disabled", ConsoleColor.Red);
+                CLIOutput.WriteLine("!");
             }
             else
             {
-                Text.Write("Autovote is ");
-                if (Vote.Auto.Enabled)
-                    Text.Write("enabled", ConsoleColor.Green);
+                CLIOutput.Write("Autovote is ");
+                if (VoteLoop.Enabled)
+                    CLIOutput.Write("enabled", ConsoleColor.Green);
                 else
-                    Text.Write("disabled", ConsoleColor.Red);
-                Text.WriteLine("!");
+                    CLIOutput.Write("disabled", ConsoleColor.Red);
+                CLIOutput.WriteLine("!");
 
-                if (Vote.Auto.Enabled)
+                if (VoteLoop.Enabled)
                 {
-                    if(!Vote.IsNicknameValid)
-                        Text.WriteLine("Nickname is not valid!", ConsoleColor.DarkRed);
-                    else
-                    {
-                        if (Vote.Auto.UntilAction < TimeSpan.FromMinutes(1))
-                            Text.WriteLine("Less than minute left!", ConsoleColor.Gray);
-                        else
-                            Text.WriteLine("{0} left!", ConsoleColor.Gray, StringUtils.GetTimeString(Vote.Auto.UntilAction));
-                    }          
+                    CLIOutput.WriteLine("State: {0}", ConsoleColor.Gray, VoteLoop.StateString);
                 }
             }
         };
@@ -200,8 +192,7 @@ namespace MCAutoVote.Interface.CommandControl
         [Description("Dumps settings.")]
         public static Command DumpSettings = (fullCmd, args) =>
         {
-            foreach(SettingsProperty prop in Properties.Settings.Default.Properties)
-                Text.WriteLine("{0} ({1}) = {2}", prop.Name, prop.PropertyType.Name, Properties.Settings.Default[prop.Name]);
+            CLIOutput.WriteLine(JsonConvert.SerializeObject(Preferences.Preferences.Data, Formatting.Indented));
         };                                                                                                                                                                                                                 
     }
 }

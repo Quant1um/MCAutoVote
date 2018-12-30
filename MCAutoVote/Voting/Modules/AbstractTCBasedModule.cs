@@ -1,4 +1,4 @@
-﻿using MCAutoVote.Interface;
+﻿using MCAutoVote.CLI;
 using MCAutoVote.Utilities;
 using MCAutoVote.Web;
 using System;
@@ -28,7 +28,7 @@ namespace MCAutoVote.Voting.Modules
             b.WaitComplete();
 
             //=== open voting modal window
-            Text.WriteLine("Opening modal");
+            CLIOutput.WriteLine("Opening modal");
             (b.Document.All.GetElementsByClass("openLoginModal")
                            .FirstOrDefault() ??
              b.Document.All.GetElementsByClass("openVoteModal")
@@ -37,7 +37,7 @@ namespace MCAutoVote.Voting.Modules
 
             b.WaitComplete();
 
-            Text.WriteLine("Performing modal checks");
+            CLIOutput.WriteLine("Performing modal checks");
             HtmlElement elem =
                 b.Document.All
                           .GetElementsByClass("modalVkLogin")
@@ -47,7 +47,7 @@ namespace MCAutoVote.Voting.Modules
 
             if (elem == null)
             {
-                Text.WriteLine("Voting for {0}", nickname);
+                CLIOutput.WriteLine("Voting for {0}", nickname);
                 b.Document.GetElementById("nick")
                           .InnerText = nickname;
                 b.Document.All
@@ -55,7 +55,7 @@ namespace MCAutoVote.Voting.Modules
                           .Single()
                           .InvokeMember("click");
 
-                Text.WriteLine("Validating");
+                CLIOutput.WriteLine("Validating");
                 HtmlElement tooltip = null;
                 FunctionalUtils.WaitWhile(() => (tooltip = b.Document.All.GetElementsByClass("tooltip-inner").FirstOrDefault()) == null, 5600, 800);
                 if (tooltip.InnerText == "Сегодня Вы уже голосовали")
@@ -63,7 +63,7 @@ namespace MCAutoVote.Voting.Modules
             }
             else
             {
-                Text.WriteLine("Authorizing");
+                CLIOutput.WriteLine("Authorizing");
 
                 //manually navigating because button not seems to be working
                 b.Navigate(new Uri(new Uri(b.DocumentUrl.GetLeftPart(UriPartial.Authority)), @"/accounts/vk/login/?process=login"));

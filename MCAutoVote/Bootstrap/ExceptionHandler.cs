@@ -1,14 +1,13 @@
-﻿using MCAutoVote.Interface;
-using System;
+﻿using System;
 using System.IO;
 using System.Text;
 
 namespace MCAutoVote.Bootstrap
 {
     [LoadModule]
-    public static class Debug
+    public static class ExceptionHandler
     {
-        static Debug()
+        static ExceptionHandler()
         {
             AppDomain.CurrentDomain.UnhandledException += OnUnhandledException;
         }
@@ -20,11 +19,11 @@ namespace MCAutoVote.Bootstrap
             _exceptionCallbackExecuted = true;
 
             if (e.ExceptionObject is Exception ex)
-                Text.WriteLine("Unhandled exception => {0}", ConsoleColor.DarkRed, ex.Message);
+                CLI.CLIOutput.WriteLine("Unhandled exception => {0}", ConsoleColor.DarkRed, ex.Message);
             else if (e.ExceptionObject != null)
-                Text.WriteLine("Unhandled error => {0}", ConsoleColor.DarkRed, e.ExceptionObject);
+                CLI.CLIOutput.WriteLine("Unhandled error => {0}", ConsoleColor.DarkRed, e.ExceptionObject);
             else
-                Text.WriteLine("Undefined error was occurred!", ConsoleColor.DarkRed);
+                CLI.CLIOutput.WriteLine("Undefined error was occurred!", ConsoleColor.DarkRed);
             
             WriteErrorToFile(e.ExceptionObject);
         }
@@ -42,7 +41,7 @@ namespace MCAutoVote.Bootstrap
 
             string path = Path.Combine(Info.Directory, "stacktrace.log");
             File.WriteAllText(path, content.ToString());
-            Text.WriteLine("Error info has been saved to {0}", ConsoleColor.Gray, path);
+            CLI.CLIOutput.WriteLine("Error info has been saved to {0}", ConsoleColor.Gray, path);
         }
 
     }

@@ -1,12 +1,16 @@
 ﻿using System;
 
-namespace MCAutoVote.Interface
+namespace MCAutoVote.CLI
 {
-    public static class Text
+    public static class CLIOutput
     {
-        public static ITextHandler Handler { get; set; } = DefaultTextHandler.Instance;
+        public static void Write(string str, ConsoleColor color, params object[] parameters)
+        {
+            Console.ForegroundColor = color;
+            Console.Write(parameters.Length == 0 ? str : string.Format(str, parameters));
+            Console.ForegroundColor = ConsoleColor.Gray;
+        }
 
-        public static void Write(string str, ConsoleColor color, params object[] parameters) => Handler.Write(str, color, parameters);
         public static void Write(string str, params object[] parameters) => Write(str, ConsoleColor.White, parameters);
         public static void Write(string str) => Write(str, ConsoleColor.White);
 

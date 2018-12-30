@@ -1,11 +1,12 @@
-﻿using MCAutoVote.Interface;
+﻿using MCAutoVote.CLI;
+using MCAutoVote.Voting;
 using System;
 using System.Threading;
 using System.Windows.Forms;
 
 namespace MCAutoVote.Bootstrap
 {
-    public class Loader
+    public class Bootstrap
     {
         private static Thread applicationThread;
 
@@ -21,7 +22,15 @@ namespace MCAutoVote.Bootstrap
             applicationThread.Start();
 
             //run console interface
-            InterfaceLifecycle.Run();
+            CLI.CLI.Init();
+            CLI.CLI.Welcome();
+
+            //run main loop
+            new Loop()
+                .Add(() => CLILoop.Update())
+                .Add(() => VoteLoop.Update())
+                //.Add(() => Application.DoEvents())
+                .Run();
         }
     }
 }
