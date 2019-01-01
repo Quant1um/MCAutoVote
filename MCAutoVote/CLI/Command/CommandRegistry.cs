@@ -3,68 +3,40 @@ using System.Collections.Generic;
 
 namespace MCAutoVote.CLI.Command
 {
-    public delegate void Command(string fullCmd, string[] args);
+    public delegate void CommandDelegate(string fullCmd, string[] args);
     public static class CommandRegistry
     {
         public static AutocompletionHandler Autocompletion { get; } = new AutocompletionHandler();
 
-        static CommandRegistry()
+        private static IList<Command> commands = new List<Command>();
+        private static IDictionary<string, Command> aliasTable = new Dictionary<string, Command>();
+        
+        public static void AddCommand(Command cmd)
         {
-            Commands.RegisterAll();
+            if (cmd.Aliases.Count == 0)
+                throw new ArgumentException("Command must have at least 1 alias!");
+
+            commands.Add(cmd);
+            foreach (string alias in cmd.Aliases)
+            {
+                aliasTable.Add(alias.ToLower(), cmd);
+            }
         }
-
-        private static IDictionary<string, Command> commands = new Dictionary<string, Command>();
-        private static IDictionary<string, string> aliases = new Dictionary<string, string>();
-        private static IDictionary<string, string> descriptions = new Dictionary<string, string>();
-
-        public static void AddCommand(string name, Command cmd)
+        
+        public static IEnumerable<Command> EnumerateCommands()
         {
-            commands.Add(name, cmd);
-            aliases.Add(name, name);
-        }
-
-        public static void AddAlias(string originalName, string alias)
-        {
-            if (!commands.ContainsKey(originalName))
-                throw new ArgumentException("Command with name " + originalName + " not exists!");
-            aliases.Add(alias, originalName);
-        }
-
-        public static void AddDescription(string originalName, string description)
-        {
-            if (!commands.ContainsKey(originalName))
-                throw new ArgumentException("Command with name " + originalName + " not exists!");
-            descriptions.Add(originalName, description);
-        }
-
-        public static IEnumerable<string> EnumerateCommands()
-        {
-            return commands.Keys;
+            return commands;
         }
 
         public static IEnumerable<string> EnumerateAliases()
         {
-            return aliases.Keys;
-        }
-
-        public static string GetNameByAlias(string alias)
-        {
-            if (aliases.TryGetValue(alias, out string name))
-                return name;
-            return null;
+            return aliasTable.Keys;
         }
 
         public static Command GetCommandByAlias(string alias)
         {
-            string name = GetNameByAlias(alias);
-            if (name == null) return null;
-            return commands[name];
-        }
-
-        public static string GetDescriptionByName(string name)
-        {
-            if (descriptions.TryGetValue(name, out string desc))
-                return desc;
+            if(aliasTable.TryGetValue(alias.ToLower(), out Command command))
+                return command;
             return null;
         }
 

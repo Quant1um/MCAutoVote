@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Runtime.Serialization;
 
 namespace MCAutoVote.Bootstrap
 {
@@ -12,7 +13,9 @@ namespace MCAutoVote.Bootstrap
             foreach (Type type in Assembly.GetEntryAssembly().GetTypes())
             {
                 if (type.GetCustomAttributes(typeof(LoadModuleAttribute), false).Length > 0)
+                {
                     RuntimeHelpers.RunClassConstructor(type.TypeHandle);
+                }
             }
         }
     }

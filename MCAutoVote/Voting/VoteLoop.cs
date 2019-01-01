@@ -5,6 +5,8 @@ using System;
 using System.Threading;
 using System.Collections.Generic;
 using MCAutoVote.Utilities;
+using OpenQA.Selenium.Remote;
+using MCAutoVote.Web;
 
 namespace MCAutoVote.Voting
 {
@@ -34,12 +36,20 @@ namespace MCAutoVote.Voting
             set => Preferences.Preferences.Data.Nickname = value;
         }
 
+        public static BrowserDriverInfo DriverInfo
+        {
+            get => Preferences.Preferences.Data.Browser;
+            set => Preferences.Preferences.Data.Browser = value;
+        }
+
         public static VoteState State
         {
             get
             {
                 if (!Enabled)
                     return VoteState.NotEnabled;
+                if (DriverInfo == null || !DriverInfo.IsWebDriverSupported)
+                    return VoteState.BrowserSetting;
                 if (StringUtils.IsNullEmptyOrWhitespace(Nickname))
                     return VoteState.Nickname;
                 if (TimeLeft > TimeSpan.Zero)
@@ -99,7 +109,7 @@ namespace MCAutoVote.Voting
                     }
                     catch (AbortException e)
                     {
-                        CLIOutput.WriteLine("Abort: {0}", ConsoleColor.DarkYellow, e.Message);
+                        CLIOutput.WriteLine("Aborted: {0}", ConsoleColor.DarkYellow, e.Message);
 
                         Thread.Sleep(800);
                         break;
@@ -128,8 +138,9 @@ namespace MCAutoVote.Voting
                 switch(State)
                 {
                     case VoteState.NotEnabled: return "Disabled!";
-                    case VoteState.NoProblem: return "Can vote now!";
-                    case VoteState.Nickname: return "No nickname is set!";
+                    case VoteState.BrowserSetting: return "Browser isn't set!";
+                    case VoteState.NoProblem: return "Voting...";
+                    case VoteState.Nickname: return "Nickname isn't set!";
                     case VoteState.Time: return StringUtils.GetTimeString(TimeLeft) + " left";
                 }
 
@@ -140,9 +151,48 @@ namespace MCAutoVote.Voting
         public enum VoteState
         {
             NoProblem,
+            BrowserSetting,
             NotEnabled,
             Nickname,
             Time
+        }
+
+        private class VoteContext : IVoteContext, IDisposable
+        {
+            public static VoteContext Create() => new VoteContext();
+
+            public string Nickname { get; }
+            public RemoteWebDriver Driver { get; }
+
+            private VoteContext()
+            {
+                Nickname = VoteLoop.Nickname;
+                Driver = DriverInfo.CreateDriver();
+            }
+
+            public void Log(string str, params object[] parameters)
+            {
+                CLIOutput.WriteLine("    " + str, ConsoleColor.Gray, parameters);
+            }
+
+            #region IDisposable Support
+            private bool disposedValue = false;
+
+            protected virtual void Dispose(bool disposing)
+            {
+                if (!disposedValue)
+                {
+                    if (disposing)
+                    {
+                        Driver.Close();
+                    }
+
+                    disposedValue = true;
+                }
+            }
+          
+            public void Dispose() => Dispose(true);
+            #endregion
         }
     }
 }

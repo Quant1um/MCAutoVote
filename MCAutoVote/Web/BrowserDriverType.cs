@@ -5,6 +5,9 @@
         Chrome,
         Firefox,
         Safari,
-        IE
+        Edge,
+        IE,
+
+        Unknown = -1
     }
 }

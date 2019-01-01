@@ -11,7 +11,7 @@ namespace MCAutoVote.Bootstrap
     {
         static Info()
         {
-            if (RegistryUtils.Autostart[Name] != ExecutablePath)
+            if (Autostart && RegistryUtils.Autostart[Name] != ExecutablePath)
                 RegistryUtils.Autostart[Name] = ExecutablePath;
         }
 
@@ -60,8 +60,8 @@ namespace MCAutoVote.Bootstrap
 
         public static bool Autostart
         {
-            get => RegistryUtils.Autostart[Name] == ExecutablePath;
-            set => RegistryUtils.Autostart[Name] = value ? ExecutablePath : null;
+            get => Preferences.Preferences.Data.Autostart;
+            set => Preferences.Preferences.Data.Autostart = value;
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using MCAutoVote.CLI;
 using MCAutoVote.Voting;
+using MCAutoVote.Web;
 using System;
 using System.Threading;
 using System.Windows.Forms;
@@ -14,7 +15,7 @@ namespace MCAutoVote.Bootstrap
         private static void Main(string[] args)
         {
             //load all modules
-            LoadModuleAttribute.LoadAll(); 
+            LoadModuleAttribute.LoadAll();
 
             //run win32 application thread
             applicationThread = new Thread(() => Application.Run(ApplicationContext.Instance)) { IsBackground = true };

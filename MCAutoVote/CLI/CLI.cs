@@ -10,8 +10,6 @@ namespace MCAutoVote.CLI
 {
     public static class CLI
     {
-        public static Random Random { get; } = new Random();
-
         public static void HandleQuery(string query)
         {
             string[] splittedQuery = query.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
@@ -20,20 +18,20 @@ namespace MCAutoVote.CLI
 
             Command.Command deleg = CommandRegistry.GetCommandByAlias(command);
             if (deleg != null)
-#if !DEBUG
-                    try
-                    {
+            {
+#if !DEBUG_COMMANDS
+                try
+                {
 #endif
-                deleg(query, splittedQuery.Skip(1).ToArray());
-#if !DEBUG
-                    }
-                    catch (Exception e)
-                    {
-                        Anchor back = anchor.Set();
-                        Text.Write("=> {0}: {1}", ConsoleColor.DarkRed, e.GetType().Name, e.Message);
-                        back.Set();
-                    }
+                    deleg.Delegate(query, splittedQuery.Skip(1).ToArray());
+#if !DEBUG_COMMANDS
+                }
+                catch (Exception e)
+                {
+                    CLIOutput.WriteLine("Error - {0}: {1}", ConsoleColor.DarkRed, e.GetType().Name, e.Message);
+                }
 #endif
+            }
             else
             {
                 CLIOutput.Write("No such command!", ConsoleColor.DarkRed);
@@ -58,15 +56,20 @@ namespace MCAutoVote.CLI
             }
         }
 
+        public static void UpdateTitle()
+        {
+            Console.Title = Info.FullName + " - " + VoteLoop.StateString;
+        }
+
         public static void Init()
         {
-            Console.Title = RandomSplash();
             Console.ForegroundColor = ConsoleColor.White;
         }
 
         public static void Welcome()
         {
             CLIOutput.WriteLine("Welcome to {0}", Info.FullName);
+            CLIOutput.WriteLine(RandomSplash(), ConsoleColor.Gray);
 
             CLIOutput.WriteLine(@"Write 'help' to list all supported commands.");
             if (!Info.Autostart)

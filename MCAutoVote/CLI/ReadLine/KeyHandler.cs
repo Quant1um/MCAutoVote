@@ -360,8 +360,7 @@ namespace Internal.ReadLine
             if (IsInAutoCompleteMode() && _keyInfo.Key != ConsoleKey.Tab)
                 ResetAutoComplete();
 
-            Action action;
-            _keyActions.TryGetValue(BuildKeyInput(), out action);
+            _keyActions.TryGetValue(BuildKeyInput(), out Action action);
             action = action ?? WriteChar;
             action.Invoke();
         }
