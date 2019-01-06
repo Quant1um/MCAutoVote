@@ -1,6 +1,8 @@
 ﻿using MCAutoVote.CLI;
 using MCAutoVote.Utilities;
 using MCAutoVote.Web;
+using OpenQA.Selenium;
+using OpenQA.Selenium.Remote;
 using System;
 using System.Linq;
 using System.Threading;
@@ -16,65 +18,50 @@ namespace MCAutoVote.Voting.Modules
 
         protected abstract string Url { get; }
 
-        public override void Vote(string nickname)
+        public override void Vote(IVoteContext ctx)
         {
             int attempts = 0;
             start:
             if (++attempts > MaxLoops)
-                throw new Exception("Too many loops. Is it an authirization bug?");
+                throw new Exception("Too many loops. Is it an authorization bug?");
 
-            Browser b = ApplicationContext.Instance.Container.Browser;
-            b.Navigate(Url);
-            b.WaitComplete();
+            RemoteWebDriver driver = ctx.Driver;
+
+            driver.Url = Url;
 
             //=== open voting modal window
-            CLIOutput.WriteLine("Opening modal");
-            (b.Document.All.GetElementsByClass("openLoginModal")
-                           .FirstOrDefault() ??
-             b.Document.All.GetElementsByClass("openVoteModal")
-                           .FirstOrDefault())
-                           .InvokeMember("click");
+            ctx.Log("Opening modal");
 
-            b.WaitComplete();
+            driver.FindElement(By.CssSelector(".openLoginModal, .openVoteModal")).Click();
 
-            CLIOutput.WriteLine("Performing modal checks");
-            HtmlElement elem =
-                b.Document.All
-                          .GetElementsByClass("modalVkLogin")
-                          .FirstOrDefault();
+            ctx.Log("Performing modal checks");
 
-            b.WaitComplete();
+            driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(3);
+            IWebElement elem = driver.FindElements(By.CssSelector(".modalVkLogin")).FirstOrDefault();
 
             if (elem == null)
             {
-                CLIOutput.WriteLine("Voting for {0}", nickname);
-                b.Document.GetElementById("nick")
-                          .InnerText = nickname;
-                b.Document.All
-                          .GetElementsByClass("voteBtn")
-                          .Single()
-                          .InvokeMember("click");
+                ctx.Log("Voting for {0}", ctx.Nickname);
+                driver.FindElement(By.CssSelector("#nick")).SendKeys(ctx.Nickname);
+                driver.FindElement(By.CssSelector(".voteBtn")).Click();
 
-                CLIOutput.WriteLine("Validating");
-                HtmlElement tooltip = null;
-                FunctionalUtils.WaitWhile(() => (tooltip = b.Document.All.GetElementsByClass("tooltip-inner").FirstOrDefault()) == null, 5600, 800);
-                if (tooltip.InnerText == "Сегодня Вы уже голосовали")
+
+                ctx.Log("Validating");
+
+                driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(10);
+                if (driver.FindElement(By.CssSelector(".tooltip-inner")).Text == "Сегодня Вы уже голосовали")
                     throw new AbortException("Already voted! ^.^");
             }
             else
             {
-                CLIOutput.WriteLine("Authorizing");
+                ctx.Log("Authorizing");
 
                 //manually navigating because button not seems to be working
-                b.Navigate(new Uri(new Uri(b.DocumentUrl.GetLeftPart(UriPartial.Authority)), @"/accounts/vk/login/?process=login"));
-                b.WaitComplete();
-
-                Utilities.CheckVKUserAuth();
+                driver.Url = new Uri(new Uri(new Uri(driver.Url).GetLeftPart(UriPartial.Authority)), @"/accounts/vk/login/?process=login").ToString();
+                Utilities.CheckVKUserAuth(ctx);
 
                 goto start; //releasing the satan from hell
             }
-
-            b.WaitComplete();
         }
     }
 }

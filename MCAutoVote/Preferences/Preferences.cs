@@ -1,13 +1,9 @@
 ﻿using MCAutoVote.Bootstrap;
 using MCAutoVote.Preferences.Editor;
-using MCAutoVote.Preferences.Reflection;
 using MCAutoVote.Web;
 using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Reflection;
 
 namespace MCAutoVote.Preferences
 {
@@ -47,6 +43,12 @@ namespace MCAutoVote.Preferences
             } catch(Exception)
             {
                 data = new PreferencesData();
+
+                try
+                {
+                    Save();
+                }
+                catch (Exception) { }
             }
         }
 
@@ -65,7 +67,7 @@ namespace MCAutoVote.Preferences
             {
                 get
                 {
-                    if(_editor == null)
+                    if (_editor == null)
                         _editor = new Editor.Editor(this);
                     return _editor;
                 }
@@ -75,9 +77,10 @@ namespace MCAutoVote.Preferences
             private bool hidden = false;
             private bool autostart = true;
             private bool enabled = true;
+            private bool lastTimeFailed = false;
             private DateTime lastVote = DateTime.MinValue;
-            private BrowserDriverInfo browser = null;
-            
+            private WebDriverInfo driverInfo = WebDriverInfo.GetDefault();
+
             [EditablePreference(CanUnset = true)]
             public string Nickname
             {
@@ -103,6 +106,20 @@ namespace MCAutoVote.Preferences
                 set
                 {
                     hidden = value;
+                    Save();
+                }
+            }
+
+            public bool LastTimeFailed
+            {
+                get
+                {
+                    return lastTimeFailed;
+                }
+
+                set
+                {
+                    lastTimeFailed = value;
                     Save();
                 }
             }
@@ -151,26 +168,60 @@ namespace MCAutoVote.Preferences
                 }
             }
 
-            [EditablePreference(CanUnset = true)]
-            public BrowserDriverInfo Browser
+            public WebDriverInfo DriverInfo
             {
                 get
                 {
-                    return browser;
+                    return driverInfo;
                 }
 
                 set
                 {
-                    browser = value;
+                    driverInfo = value;
+                    Save();
+                }
+            }
+
+            [JsonIgnore]
+            [EditablePreference(CanUnset = true, Name = "browser")]
+            private WebDriverType? BrowserType
+            {
+                get
+                {
+                    return driverInfo.Browser;
+                }
+
+                set
+                {
+                    if (value == null)
+                        driverInfo = new WebDriverInfo();
+                    else
+                        driverInfo = WebDriverInfo.GetByType(value.Value);
+                    Save();
+                }
+            }
+
+            [JsonIgnore]
+            [EditablePreference(CanUnset = true, Name = "browserPath")]
+            private string BrowserPath
+            {
+                get
+                {
+                    return driverInfo.Path;
+                }
+
+                set
+                {
+                    driverInfo.Path = value;
                     Save();
                 }
             }
 
             public void Fix()
             {
-                if(Browser != null && !Browser.IsWebDriverSupported)
+                if(!driverInfo.IsWebDriverSupported)
                 {
-                    Browser = null;
+                    driverInfo = WebDriverInfo.GetDefault();
                 }
             }
         }

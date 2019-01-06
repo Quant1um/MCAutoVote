@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using MCAutoVote.Utilities;
 using OpenQA.Selenium.Remote;
 using MCAutoVote.Web;
+using OpenQA.Selenium;
 
 namespace MCAutoVote.Voting
 {
@@ -36,19 +37,23 @@ namespace MCAutoVote.Voting
             set => Preferences.Preferences.Data.Nickname = value;
         }
 
-        public static BrowserDriverInfo DriverInfo
+        public static bool LastTimeFailed
         {
-            get => Preferences.Preferences.Data.Browser;
-            set => Preferences.Preferences.Data.Browser = value;
+            get => Preferences.Preferences.Data.LastTimeFailed;
+            set => Preferences.Preferences.Data.LastTimeFailed = value;
         }
+
+        public static WebDriverInfo DriverInfo => Preferences.Preferences.Data.DriverInfo;
 
         public static VoteState State
         {
             get
             {
+                if (LastTimeFailed)
+                    return VoteState.LastTimeFailed;
                 if (!Enabled)
                     return VoteState.NotEnabled;
-                if (DriverInfo == null || !DriverInfo.IsWebDriverSupported)
+                if (!DriverInfo.IsWebDriverSupported)
                     return VoteState.BrowserSetting;
                 if (StringUtils.IsNullEmptyOrWhitespace(Nickname))
                     return VoteState.Nickname;
@@ -76,59 +81,103 @@ namespace MCAutoVote.Voting
         {
             switch(State)
             {
+                case VoteState.BrowserSetting:
+                    throw new InvalidOperationException("Cannot vote: no browser is set!");
                 case VoteState.Nickname:
                     throw new InvalidOperationException("Cannot vote: no nickname is set!");
             }
 
-            PerformVote();
-            LastVoteUtc = DateTime.UtcNow;
+            try
+            {
+                PerformVote();
+                LastTimeFailed = false;
+                LastVoteUtc = DateTime.UtcNow;
+            } catch(Exception e) {
+                LastTimeFailed = true;
+                CLIOutput.WriteLine("Unknown error: {0} - {1}", ConsoleColor.DarkRed, e.GetType().Name, e.Message);
+            }
         }
 
         private static void PerformVote()
         {
-            CLIOutput.WriteLine("Nickname: {0}", ConsoleColor.Cyan, Preferences.Preferences.Data.Nickname);
-
-            int success = 0;
-            int count = 0;
-
-            foreach (Module module in Modules)
+            try
             {
-                count++;
-                for (int attempts = 0; attempts < Attempts; attempts++)
+
+                CLIOutput.WriteLine("Nickname: {0}", ConsoleColor.Cyan, Preferences.Preferences.Data.Nickname);
+
+                int success = 0;
+                int count = 0;
+
+                using (VoteContext ctx = VoteContext.Create())
                 {
-                    try
+                    foreach (Module module in Modules)
                     {
-                        CLIOutput.WriteLine("Voting: {0}. Attempt #{1}. ", ConsoleColor.White, module, attempts + 1);
+                        count++;
+                        for (int attempts = 0; attempts < Attempts; attempts++)
+                        {
+                            try
+                            {
+                                CLIOutput.WriteLine("Voting: {0}. Attempt #{1}. ", ConsoleColor.White, module, attempts + 1);
 
-                        module.Vote(Preferences.Preferences.Data.Nickname);
-                        success++;
+                                module.Vote(ctx);
+                                success++;
 
-                        CLIOutput.WriteLine("Success!", ConsoleColor.Green);
+                                CLIOutput.WriteLine("Success!", ConsoleColor.Green);
 
-                        break;
-                    }
-                    catch (AbortException e)
-                    {
-                        CLIOutput.WriteLine("Aborted: {0}", ConsoleColor.DarkYellow, e.Message);
+                                break;
+                            }
+                            catch (NoSuchWindowException)
+                            {
+                                CLIOutput.WriteLine("Window was closed: voting has been terminated", ConsoleColor.DarkYellow);
 
-                        Thread.Sleep(800);
-                        break;
-                    }
+                                Thread.Sleep(800);
+                                return;
+                            }
+                            catch (InvalidOperationException)
+                            {
+                                CLIOutput.WriteLine("Session lost.", ConsoleColor.DarkYellow);
+
+                                Thread.Sleep(800);
+                                return;
+                            }
+                            catch (AbortException e)
+                            {
+                                CLIOutput.WriteLine("Aborted: {0}", ConsoleColor.DarkYellow, e.Message);
+
+                                Thread.Sleep(800);
+                                break;
+                            }
 #if !DEBUG_MODULES
-                    catch (Exception e)
-                    {
-                        CLIOutput.WriteLine("Error: {0} - {1}", ConsoleColor.DarkRed, e.GetType().Name, e.Message);
-                        Thread.Sleep(800);
-                    }
+                            catch (Exception e)
+                            {
+                                CLIOutput.WriteLine("Error: {0} - {1}", ConsoleColor.DarkRed, e.GetType().Name, e.Message);
+                                Thread.Sleep(800);
+                            }
 #endif
+                        }
+                    }
                 }
+
+                CLIOutput.Write("Successful votes: {0}, ", ConsoleColor.Green, success);
+                CLIOutput.WriteLine("failed: {0}", ConsoleColor.DarkRed, count - success);
+
+                Thread.Sleep(100);
+                CLIOutput.WriteLine("Completed!", ConsoleColor.White);
             }
+            catch (NoSuchWindowException)
+            {
+                CLIOutput.WriteLine("Window was closed: voting has been terminated", ConsoleColor.DarkYellow);
 
-            CLIOutput.Write("Successful votes: {0}, ", ConsoleColor.Green, success);
-            CLIOutput.WriteLine("failed: {0}", ConsoleColor.DarkRed, count - success);
+                Thread.Sleep(800);
+                return;
+            }
+            catch (InvalidOperationException)
+            {
+                CLIOutput.WriteLine("Session was failed to create.", ConsoleColor.DarkYellow);
 
-            Thread.Sleep(100);
-            CLIOutput.WriteLine("Completed!", ConsoleColor.White);
+                Thread.Sleep(800);
+                return;
+            }
         }
 
         public static string StateString
@@ -137,6 +186,7 @@ namespace MCAutoVote.Voting
             {
                 switch(State)
                 {
+                    case VoteState.LastTimeFailed: return "Suspended due to unknown failure: run 'vote' command to restore";
                     case VoteState.NotEnabled: return "Disabled!";
                     case VoteState.BrowserSetting: return "Browser isn't set!";
                     case VoteState.NoProblem: return "Voting...";
@@ -151,6 +201,7 @@ namespace MCAutoVote.Voting
         public enum VoteState
         {
             NoProblem,
+            LastTimeFailed,
             BrowserSetting,
             NotEnabled,
             Nickname,
@@ -161,38 +212,27 @@ namespace MCAutoVote.Voting
         {
             public static VoteContext Create() => new VoteContext();
 
+            private readonly WebDriverWrapper wrapper;
+
             public string Nickname { get; }
-            public RemoteWebDriver Driver { get; }
+            public RemoteWebDriver Driver => wrapper.Driver;
 
             private VoteContext()
             {
                 Nickname = VoteLoop.Nickname;
-                Driver = DriverInfo.CreateDriver();
-            }
 
+                wrapper = DriverInfo.CreateWrapper();
+            }
+            
             public void Log(string str, params object[] parameters)
             {
-                CLIOutput.WriteLine("    " + str, ConsoleColor.Gray, parameters);
+                CLIOutput.WriteLine("| " + str, ConsoleColor.Gray, parameters);
             }
 
-            #region IDisposable Support
-            private bool disposedValue = false;
-
-            protected virtual void Dispose(bool disposing)
+            public void Dispose()
             {
-                if (!disposedValue)
-                {
-                    if (disposing)
-                    {
-                        Driver.Close();
-                    }
-
-                    disposedValue = true;
-                }
+                wrapper.Dispose();
             }
-          
-            public void Dispose() => Dispose(true);
-            #endregion
         }
     }
 }

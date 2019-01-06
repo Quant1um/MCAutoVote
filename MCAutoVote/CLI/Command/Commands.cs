@@ -6,6 +6,7 @@ using MCAutoVote.Voting;
 using MCAutoVote.Utilities;
 using Newtonsoft.Json;
 using MCAutoVote.Bootstrap;
+using MCAutoVote.Preferences;
 
 namespace MCAutoVote.CLI.Command
 {
@@ -140,7 +141,7 @@ namespace MCAutoVote.CLI.Command
         {
             if (args.Length >= 1)
             {
-                bool state = StringUtils.ParseState(args[0], new string[] { "enable", "on" }, new string[] { "disable", "off" });
+                bool state = (bool)StringConverter.Get(typeof(bool)).FromString(args[0]);
                 Bootstrap.Info.Autostart = state;
 
                 CLIOutput.Write("Autostart has been ");
@@ -168,7 +169,7 @@ namespace MCAutoVote.CLI.Command
         {
             if (args.Length >= 1)
             {
-                bool state = StringUtils.ParseState(args[0], new string[] { "enable", "on" }, new string[] { "disable", "off" });
+                bool state = (bool)StringConverter.Get(typeof(bool)).FromString(args[0]);
                 VoteLoop.Enabled = state;
                 CLIOutput.Write("Autovote has been ");
                 if (state)

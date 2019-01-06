@@ -1,13 +1,11 @@
 ﻿namespace MCAutoVote.Web
 {
-    public enum BrowserDriverType
+    public enum WebDriverType
     {
         Chrome,
         Firefox,
         Safari,
         Edge,
-        IE,
-
-        Unknown = -1
+        IE
     }
 }

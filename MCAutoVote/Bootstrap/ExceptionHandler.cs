@@ -4,10 +4,9 @@ using System.Text;
 
 namespace MCAutoVote.Bootstrap
 {
-    [LoadModule]
     public static class ExceptionHandler
     {
-        static ExceptionHandler()
+        public static void Attach()
         {
             AppDomain.CurrentDomain.UnhandledException += OnUnhandledException;
         }
@@ -19,7 +18,12 @@ namespace MCAutoVote.Bootstrap
             _exceptionCallbackExecuted = true;
 
             if (e.ExceptionObject is Exception ex)
+            {
                 CLI.CLIOutput.WriteLine("Unhandled exception => {0}", ConsoleColor.DarkRed, ex.Message);
+#if DEBUG
+                CLI.CLIOutput.WriteLine(ex.StackTrace);
+#endif
+            }
             else if (e.ExceptionObject != null)
                 CLI.CLIOutput.WriteLine("Unhandled error => {0}", ConsoleColor.DarkRed, e.ExceptionObject);
             else

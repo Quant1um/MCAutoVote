@@ -1,6 +1,8 @@
 ﻿using MCAutoVote.CLI;
 using MCAutoVote.Utilities;
 using MCAutoVote.Web;
+using OpenQA.Selenium;
+using OpenQA.Selenium.Support.UI;
 using System;
 
 namespace MCAutoVote.Voting.Modules
@@ -13,7 +15,7 @@ namespace MCAutoVote.Voting.Modules
             ProjectId = projectId;
         }
 
-        public abstract void Vote(string nickname);
+        public abstract void Vote(IVoteContext context);
 
         public abstract string Name { get; }
 
@@ -24,14 +26,11 @@ namespace MCAutoVote.Voting.Modules
 
         protected static class Utilities
         {
-            public static void CheckVKUserAuth()
+            public static void CheckVKUserAuth(IVoteContext ctx)
             {
-                Browser b = ApplicationContext.Instance.Container.Browser;
-                if (b.DocumentUrl.Host.ToLower() == "oauth.vk.com")
-                {
-                    CLIOutput.WriteLine("Waiting user for authorization");
-                    FunctionalUtils.WaitWhile(() => b.DocumentUrl.Host.ToLower() == "oauth.vk.com", 60000, 2000);
-                }
+                ctx.Log("Waiting user for authorization");
+                new WebDriverWait(ctx.Driver, TimeSpan.FromMinutes(1.2f))
+                    .Until((d) => new Uri(d.Url).Host.ToLower() != "oauth.vk.com");
             }
         }
     }

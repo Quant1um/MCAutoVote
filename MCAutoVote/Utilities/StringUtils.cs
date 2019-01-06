@@ -68,29 +68,6 @@ namespace MCAutoVote.Utilities
             return builder.ToString();
         }
 
-        public static bool ParseState(string input, string[] truly, string[] falsy)
-        {
-            if (TryParseState(input, truly, falsy, out bool state))
-                return state;
-            else
-                throw new ArgumentException("Invalid token!");
-        }
-
-        public static bool TryParseState(string input, string[] truly, string[] falsy, out bool result)
-        {
-            result = false;
-            if (input == null) return false;
-            input = input.ToLower();
-
-            if (truly.Any(f => f.ToLower() == input))
-                result = true;
-            else if (falsy.Any(f => f.ToLower() == input))
-                result = false;
-            else
-                return false;
-            return true;
-        }
-
         public static bool IsNullEmptyOrWhitespace(string str)
         {
             return str == null || str.Trim().Length == 0;

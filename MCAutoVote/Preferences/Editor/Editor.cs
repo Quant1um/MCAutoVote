@@ -42,9 +42,13 @@ namespace MCAutoVote.Preferences.Editor
 
         public string Unset(string name)
         {
-            if (!GetEditableInfo(name).CanUnset)
+            EditableInfo info = GetEditableInfo(name);
+            if (!info.CanUnset)
                 throw new ArgumentException("Can't unset '" + name + "' preference.");
-            return Set(name, null);
+
+            string old = Get(name);
+            info.DirectAccessor.Set(owner, info.Default);
+            return old;
         }
 
         public IDictionary<string, string> View()

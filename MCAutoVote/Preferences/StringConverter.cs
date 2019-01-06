@@ -10,7 +10,7 @@ namespace MCAutoVote.Preferences
         {
             [typeof(string)] = new StringIdentityConverter(),
             [typeof(bool)] = new BooleanConverter(),
-            [typeof(BrowserDriverInfo)] = new BrowserDriverInfoConverter()
+            [typeof(WebDriverType?)] = new WebDriverTypeConverter()
         };
 
         public static StringConverter Get(Type type)
@@ -64,11 +64,19 @@ namespace MCAutoVote.Preferences
             }
         }
 
-        private class BrowserDriverInfoConverter : StringConverter
+        private class WebDriverTypeConverter : StringConverter
         {
             public override object FromString(string str) {
                 if (str == null) return null;
-                return BrowserDriverInfo.Parse(str);
+
+                str = str.ToLower();
+                foreach(Enum @enum in Enum.GetValues(typeof(WebDriverType)))
+                {
+                    if (@enum.ToString().ToLower().Equals(str))
+                        return @enum;
+                }
+
+                throw new ArgumentException("Invalid enum value!");
             }
 
             public override string ToString(object obj)
