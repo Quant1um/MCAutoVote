@@ -126,17 +126,19 @@ namespace MCAutoVote.Voting
 
                                 break;
                             }
-                            catch (NoSuchWindowException)
+                            catch (NoSuchWindowException e)
                             {
                                 CLIOutput.WriteLine("Window was closed: voting has been terminated", ConsoleColor.DarkYellow);
+                                CLIOutput.WriteLine(e.Message);
 
                                 Thread.Sleep(800);
                                 return;
                             }
-                            catch (InvalidOperationException)
+                            catch (InvalidOperationException e)
                             {
                                 CLIOutput.WriteLine("Session lost.", ConsoleColor.DarkYellow);
-
+                                CLIOutput.WriteLine(e.Message);
+                                
                                 Thread.Sleep(800);
                                 return;
                             }
@@ -164,16 +166,18 @@ namespace MCAutoVote.Voting
                 Thread.Sleep(100);
                 CLIOutput.WriteLine("Completed!", ConsoleColor.White);
             }
-            catch (NoSuchWindowException)
+            catch (NoSuchWindowException e)
             {
                 CLIOutput.WriteLine("Window was closed: voting has been terminated", ConsoleColor.DarkYellow);
+                CLIOutput.WriteLine(e.Message);
 
                 Thread.Sleep(800);
                 return;
             }
-            catch (InvalidOperationException)
+            catch (InvalidOperationException e)
             {
                 CLIOutput.WriteLine("Session was failed to create.", ConsoleColor.DarkYellow);
+                CLIOutput.WriteLine(e.Message);
 
                 Thread.Sleep(800);
                 return;

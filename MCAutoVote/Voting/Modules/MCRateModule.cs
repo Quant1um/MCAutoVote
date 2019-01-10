@@ -73,6 +73,8 @@ namespace MCAutoVote.Voting.Modules
 
 
             ctx.Log("Voting for {0}", ctx.Nickname);
+
+            elem.Clear();
             elem.SendKeys(ctx.Nickname);
 
             driver.FindElement(By.CssSelector("#buttonrate")).Click();

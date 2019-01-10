@@ -31,7 +31,8 @@ namespace MCAutoVote.Voting.Modules
 
             //=== open voting modal window
             ctx.Log("Opening modal");
-
+            
+            driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(3);
             driver.FindElement(By.CssSelector(".openLoginModal, .openVoteModal")).Click();
 
             ctx.Log("Performing modal checks");
@@ -42,9 +43,10 @@ namespace MCAutoVote.Voting.Modules
             if (elem == null)
             {
                 ctx.Log("Voting for {0}", ctx.Nickname);
+
+                driver.FindElement(By.CssSelector("#nick")).Clear();
                 driver.FindElement(By.CssSelector("#nick")).SendKeys(ctx.Nickname);
                 driver.FindElement(By.CssSelector(".voteBtn")).Click();
-
 
                 ctx.Log("Validating");
 

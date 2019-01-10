@@ -53,7 +53,7 @@ namespace MCAutoVote.Bootstrap
         }
 
         public static string Name { get; } = "MCAutoVote";
-        public static string Version { get; } = "0.1";
+        public static string Version { get; } = "0.2";
         public static string ExecutablePath { get; } = Assembly.GetEntryAssembly().Location;
         public static string ExecutableName { get; } = Path.GetFileName(ExecutablePath);
         public static string Directory { get; } = Path.Combine(Path.GetDirectoryName(ExecutablePath), "Data");
